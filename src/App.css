@@ -9,18 +9,10 @@ html, body {
   position: relative;
   z-index: 1; }
 
-.container {
-  margin: 0 auto;
-  width: 350px;
-  height: 200px;
-  position: relative; }
-
-.carousel {
-  height: 100%;
-  width: 100%;
+canvas {
+  display: block;
   position: absolute;
-  transform-style: preserve-3d;
-  transition: transform 1.5s; }
+  z-index: 0; }
 
 .next, .prev {
   color: #444;
@@ -46,48 +38,3 @@ html, body {
 
 .prev {
   left: 5em; }
-
-canvas {
-  display: block;
-  position: absolute;
-  z-index: 0; }
-
-.showcase {
-  margin-top: 20%; }
-  .showcase ul {
-    margin: 0;
-    margin-top: 30%;
-    padding: 0;
-    transform: rotateX(-5deg); }
-    .showcase ul li {
-      display: block;
-      width: 300px;
-      position: absolute;
-      background: #fff;
-      opacity: .75;
-      padding: 25px;
-      margin: 0;
-      border: 3px solid #222;
-      border-radius: 10px;
-      border-image-slice: 1;
-      color: #444;
-      background: #CCC;
-      border-radius: 5px;
-      transform-style: preserve-3d; }
-      .showcase ul li:hover {
-        opacity: 1.0; }
-      .showcase ul li * {
-        backface-visibility: hidden;
-        -webkit-backface-visibility: hidden; }
-      .showcase ul li:nth-child(0) {
-        transform: rotateY(0deg) translateZ(350px); }
-      .showcase ul li:nth-child(1) {
-        transform: rotateY(72deg) translateZ(350px); }
-      .showcase ul li:nth-child(2) {
-        transform: rotateY(144deg) translateZ(350px); }
-      .showcase ul li:nth-child(3) {
-        transform: rotateY(216deg) translateZ(350px); }
-      .showcase ul li:nth-child(4) {
-        transform: rotateY(288deg) translateZ(350px); }
-      .showcase ul li:nth-child(5) {
-        transform: rotateY(360deg) translateZ(350px); }

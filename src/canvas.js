@@ -109,6 +109,9 @@ export default function start() {
   }
 
   function createShootingStar() {
+    // We don't want to make too many shooting stars if the state was suspended
+    if (shootingStars.length > 1) return null;
+
     var shootingStar = particle.create(randomRange(width / 2, width), randomRange(0, height / 2), 0, 0);
     shootingStar.setSpeed(randomRange(settings.shootingStarSpeed.min, settings.shootingStarSpeed.max));
     shootingStar.setHeading(degreesToRads(starsAngleRange()));
@@ -151,8 +154,9 @@ export default function start() {
         }
       }
 
-      for (i = 0; i < shootingStars.length; i += 1) {
+      for (i = 0; i < shootingStars.length; ++i) {
         var shootingStar = shootingStars[i];
+        
         if (shootingStar.isSpawning) {
           shootingStar.opacity += shootingStarOpacityDelta;
           if (shootingStar.opacity >= 1.0) {
@@ -167,6 +171,7 @@ export default function start() {
             shootingStar.isDead = true;
           }
         }
+
         shootingStar.trailLengthDelta += trailLengthDelta;
 
         shootingStar.update();

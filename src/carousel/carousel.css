@@ -1,0 +1,28 @@
+.carousel {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-style: preserve-3d;
+  transition: transform 1.5s; }
+
+.showcase {
+  margin-top: 20%; }
+  .showcase ul {
+    margin: 0;
+    margin-top: 30%;
+    padding: 0;
+    transform: rotateX(-5deg); }
+    .showcase ul li:nth-child(0) {
+      transform: rotateY(0deg) translateZ(350px); }
+    .showcase ul li:nth-child(1) {
+      transform: rotateY(72deg) translateZ(350px); }
+    .showcase ul li:nth-child(2) {
+      transform: rotateY(144deg) translateZ(350px); }
+    .showcase ul li:nth-child(3) {
+      transform: rotateY(216deg) translateZ(350px); }
+    .showcase ul li:nth-child(4) {
+      transform: rotateY(288deg) translateZ(350px); }
+    .showcase ul li:nth-child(5) {
+      transform: rotateY(360deg) translateZ(350px); }

@@ -1,0 +1,29 @@
+li.carousel-item {
+  // text-align: left;
+  display: block;
+  width: 300px;
+  position: absolute;
+  background: #fff;
+  opacity: .75;
+  padding: 25px;
+  margin: 0;
+  border: 3px solid #222;
+  // border-image: linear-gradient(-155deg,#C8A6B4,#16054A);
+  border-radius: 10px;
+  border-image-slice: 1;
+        
+  color: #444;
+  background: #CCC;
+  border-radius: 5px;
+  
+  transform-style: preserve-3d;
+  
+  &:hover {
+    opacity: 0.95;
+  }
+  
+  * {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+}
