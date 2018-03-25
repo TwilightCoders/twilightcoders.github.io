@@ -1,11 +1,18 @@
 // Carousel logic
 
+.container {
+  margin: 0 auto;
+  width: 350px;
+  height: 200px;
+  position: relative;
+  // transform-style: preserve-3d;
+	// transform: perspective(500);
+}
+
 .carousel {
   height: 100%;
   width: 100%;
   position: absolute;
-  top: 0;
-  left: 0;
   transform-style: preserve-3d;
   transition: transform 1.5s;
 }
@@ -18,7 +25,7 @@
 	
 	ul {
     margin: 0;
-		margin-top: 30%;
+		margin-top: 0%;
 		padding: 0;
 		// list-style-type: none;
 		// // border: 1px solid red;

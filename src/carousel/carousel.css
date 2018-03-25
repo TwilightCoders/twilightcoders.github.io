@@ -1,9 +1,13 @@
+.container {
+  margin: 0 auto;
+  width: 350px;
+  height: 200px;
+  position: relative; }
+
 .carousel {
   height: 100%;
   width: 100%;
   position: absolute;
-  top: 0;
-  left: 0;
   transform-style: preserve-3d;
   transition: transform 1.5s; }
 
@@ -11,7 +15,7 @@
   margin-top: 20%; }
   .showcase ul {
     margin: 0;
-    margin-top: 30%;
+    margin-top: 0%;
     padding: 0;
     transform: rotateX(-5deg); }
     .showcase ul li:nth-child(0) {

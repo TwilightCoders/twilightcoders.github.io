@@ -6,7 +6,6 @@ html, body {
   font: 15px/20px Arial, sans-serif; }
 
 #root {
-  position: relative;
   z-index: 1; }
 
 canvas {
