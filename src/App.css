@@ -23,7 +23,8 @@ canvas {
   border-radius: 5px;
   border-top: 1px solid #FFF;
   box-shadow: 0 5px 0 #999;
-  transition: box-shadow 0.1s, top 0.1s; }
+  transition: box-shadow 0.1s, top 0.1s;
+  user-select: none; }
 
 .next:hover, .prev:hover {
   color: #000; }
