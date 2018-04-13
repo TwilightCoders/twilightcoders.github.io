@@ -9,6 +9,7 @@
   width: 100%;
   position: absolute;
   transform-style: preserve-3d;
+  transition: height 1.5s ease-in-out;
   transition: transform 1.5s; }
 
 .showcase {
@@ -21,12 +22,14 @@
     .showcase ul li:nth-child(0) {
       transform: rotateY(0deg) translateZ(350px); }
     .showcase ul li:nth-child(1) {
-      transform: rotateY(72deg) translateZ(350px); }
+      transform: rotateY(60deg) translateZ(350px); }
     .showcase ul li:nth-child(2) {
-      transform: rotateY(144deg) translateZ(350px); }
+      transform: rotateY(120deg) translateZ(350px); }
     .showcase ul li:nth-child(3) {
-      transform: rotateY(216deg) translateZ(350px); }
+      transform: rotateY(180deg) translateZ(350px); }
     .showcase ul li:nth-child(4) {
-      transform: rotateY(288deg) translateZ(350px); }
+      transform: rotateY(240deg) translateZ(350px); }
     .showcase ul li:nth-child(5) {
+      transform: rotateY(300deg) translateZ(350px); }
+    .showcase ul li:nth-child(6) {
       transform: rotateY(360deg) translateZ(350px); }

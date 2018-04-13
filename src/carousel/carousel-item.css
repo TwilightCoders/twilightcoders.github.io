@@ -1,6 +1,7 @@
 li.carousel-item {
   display: block;
   width: 300px;
+  height: 175px;
   position: absolute;
   background: #fff;
   opacity: .75;
@@ -9,12 +10,21 @@ li.carousel-item {
   border: 3px solid #222;
   border-radius: 10px;
   border-image-slice: 1;
+  overflow: hidden;
   color: #444;
   background: #CCC;
   border-radius: 5px;
   transform-style: preserve-3d; }
-  li.carousel-item:hover {
-    opacity: 0.95; }
+  li.carousel-item.active:hover, li.carousel-item.big {
+    opacity: 0.95;
+    cursor: pointer; }
+  li.carousel-item.active:not(.big):hover {
+    padding: 35px 25px;
+    margin-top: -10px; }
+  li.carousel-item.big {
+    margin-top: -50%;
+    height: 200%;
+    overflow: auto; }
   li.carousel-item * {
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden; }

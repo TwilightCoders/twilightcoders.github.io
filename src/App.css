@@ -29,7 +29,7 @@ canvas {
 .next:hover, .prev:hover {
   color: #000; }
 
-.next:active, .prev:active {
+.App:not(.paused) .next:active, .App:not(.paused) .prev:active {
   top: 104px;
   box-shadow: 0 1px 0 #999; }
 
@@ -38,3 +38,7 @@ canvas {
 
 .prev {
   left: 5em; }
+
+.App.paused .next, .App.paused .prev {
+  text-decoration: line-through;
+  color: #666; }

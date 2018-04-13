@@ -2,6 +2,7 @@ li.carousel-item {
   // text-align: left;
   display: block;
   width: 300px;
+  height: 175px;
   position: absolute;
   background: #fff;
   opacity: .75;
@@ -11,15 +12,29 @@ li.carousel-item {
   // border-image: linear-gradient(-155deg,#C8A6B4,#16054A);
   border-radius: 10px;
   border-image-slice: 1;
+
+  overflow: hidden;
         
   color: #444;
   background: #CCC;
   border-radius: 5px;
   
   transform-style: preserve-3d;
-  
-  &:hover {
+
+  &.active:hover, &.big {
     opacity: 0.95;
+    cursor: pointer;
+  }
+  
+  &.active:not(.big):hover {
+    padding: 35px 25px;
+    margin-top: -10px;
+  }
+
+  &.big {
+    margin-top: -50%;
+    height: 200%;
+    overflow: auto;
   }
   
   * {
