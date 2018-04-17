@@ -6,7 +6,7 @@ import {
 } from 'relay-runtime';
 
 function fetchQuery(operation, variables) {
-  let token = 'caa4d4aaf7c8272804f6993aef6dcb4c37a521fe';//process.env.NODE_ENV === 'development' ? process.env.REACT_APP_GRAPHQL_TOKEN : null;
+  let token = process.env.NODE_ENV === 'development' ? process.env.REACT_APP_GRAPHQL_TOKEN : null;
 
   let getToken = fetch('https://s3.amazonaws.com/jimmyvanveen-bucket/tc_gh_token.txt')
     .then(response => {
