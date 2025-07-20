@@ -50,8 +50,45 @@ class InfiniteCarousel {
     setupCardClickListeners() {
         this.cards.forEach((card, index) => {
             card.addEventListener('click', (e) => {
+                console.log('Card click detected:', index, 'hasDragged:', this.hasDragged, 'isStacked:', this.isStacked);
+                
                 // Only handle clicks if we haven't dragged and not stacked
-                if (this.hasDragged || this.isStacked || this.isAnimating) return;
+                if (this.hasDragged || this.isStacked || this.isAnimating) {
+                    console.log('Click blocked - state check failed');
+                    return;
+                }
+                
+                // Only allow clicks on visible cards
+                if (card.style.display === 'none' || card.style.visibility === 'hidden') {
+                    console.log('Click blocked - visibility check failed');
+                    return;
+                }
+                
+                // Check if card is actually clickable (not hidden behind others)
+                if (card.classList.contains('hidden')) {
+                    console.log('Click blocked - hidden class');
+                    return;
+                }
+                
+                // Check if click is actually on the visible part of the card
+                const rect = card.getBoundingClientRect();
+                const clickX = e.clientX;
+                const clickY = e.clientY;
+                
+                if (clickX < rect.left || clickX > rect.right || clickY < rect.top || clickY > rect.bottom) {
+                    console.log('Click blocked - outside card bounds');
+                    return;
+                }
+                
+                // Check opacity - don't allow clicks on very transparent cards
+                const computedStyle = window.getComputedStyle(card);
+                const opacity = parseFloat(computedStyle.opacity);
+                if (opacity < 0.5) {
+                    console.log('Click blocked - opacity too low:', opacity);
+                    return;
+                }
+                
+                console.log('Click allowed - bringing card to center');
                 
                 // Prevent default link behavior for now
                 e.preventDefault();
@@ -66,6 +103,9 @@ class InfiniteCarousel {
     handleStart(e) {
         if (this.isAnimating) return;
         
+        // Prevent default behavior to avoid text selection
+        e.preventDefault();
+        
         const clientX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
         this.startX = clientX;
         this.currentX = clientX;
@@ -76,13 +116,16 @@ class InfiniteCarousel {
     }
     
     handleMove(e) {
+        // Only process if we actually started a drag on a card
+        if (this.startX === 0) return;
+        
         const clientX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
         this.currentX = clientX;
         
         const deltaX = this.currentX - this.startX;
         
-        // Start dragging if we've moved enough
-        if (!this.isDragging && Math.abs(deltaX) > 5) {
+        // Start dragging immediately on any movement for maximum responsiveness
+        if (!this.isDragging && Math.abs(deltaX) > 0) {
             this.isDragging = true;
             this.hasDragged = true;
             this.carousel.classList.add('dragging');
@@ -91,16 +134,23 @@ class InfiniteCarousel {
         if (!this.isDragging) return;
         
         e.preventDefault();
-        // Don't apply transforms during drag - wait for end
+        
+        // Apply real-time rotation during drag for smooth feedback
+        const rotationDelta = (deltaX / window.innerWidth) * 120; // Reduced sensitivity for smoother feel
+        const currentRotation = this.rotation + rotationDelta;
+        this.applyTransforms(currentRotation);
     }
     
     handleEnd(e) {
+        // Only process if we actually started a drag on a card
+        if (this.startX === 0) return;
+        
         if (this.isDragging) {
             this.isDragging = false;
             this.carousel.classList.remove('dragging');
             
             const deltaX = this.currentX - this.startX;
-            const rotationDelta = (deltaX / window.innerWidth) * 180;
+            const rotationDelta = (deltaX / window.innerWidth) * 120; // Match the sensitivity from handleMove
             
             // Update rotation based on drag
             this.rotation += rotationDelta;
@@ -115,8 +165,14 @@ class InfiniteCarousel {
             this.updateCarousel();
         }
         
-        // Reset drag tracking
-        this.hasDragged = false;
+        // Reset all drag tracking
+        this.startX = 0;
+        this.currentX = 0;
+        
+        // Reset drag tracking after a small delay to prevent immediate clicks
+        setTimeout(() => {
+            this.hasDragged = false;
+        }, 100);
     }
     
     handleKeyboard(e) {

@@ -90,7 +90,7 @@
 	
 	.tagline {
 		font-size: 1.5rem;
-		margin-bottom: 3rem;
+		/* margin-bottom: 3rem; */
 		opacity: 0.9;
 		max-width: 600px;
 		text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
@@ -99,8 +99,8 @@
 	.projects-section {
 		background: rgba(40, 42, 58, 0.8);
 		border-radius: 10px;
-		padding: 2rem;
-		margin: 2rem 0;
+		/* padding: 2rem; */
+		margin-bottom: 20%;
 		max-width: 800px;
 		backdrop-filter: blur(5px);
 	}
@@ -115,7 +115,7 @@
 		position: relative;
 		width: 100%;
 		height: 500px;
-		margin: 2rem 0;
+		/* margin: 2rem 0; */
 		overflow: visible;
 		display: flex;
 		justify-content: center;
@@ -132,10 +132,18 @@
 		transform-style: preserve-3d;
 		display: flex;
 		align-items: center;
+		user-select: none;
+		-webkit-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
 	}
 	
 	.project-card {
-		cursor: pointer;
+		cursor: grab;
+	}
+	
+	.project-card:active {
+		cursor: grabbing;
 	}
 	
 	.carousel.dragging {
@@ -145,6 +153,11 @@
 		-webkit-user-select: none;
 		-moz-user-select: none;
 		-ms-user-select: none;
+	}
+	
+	.carousel.dragging .project-card {
+		cursor: grabbing;
+		transition: none;
 	}
 	
 	.carousel.dragging * {
@@ -158,14 +171,14 @@
 		position: absolute;
 		width: 280px;
 		height: 350px;
-		background: linear-gradient(145deg, rgba(40, 42, 58, 0.9), rgba(30, 32, 48, 0.8));
+		background: linear-gradient(145deg, rgba(40, 42, 58, 1), rgba(30, 32, 48, 1));
 		border-radius: 15px;
 		padding: 2rem 1.5rem;
 		border: 1px solid rgba(255, 221, 157, 0.3);
 		box-shadow: 
 			0 8px 32px rgba(0, 0, 0, 0.3),
 			inset 0 1px 0 rgba(255, 255, 255, 0.2);
-		transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.8s ease, filter 0.6s ease;
+		transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease, filter 0.3s ease;
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
@@ -174,7 +187,11 @@
 		top: 50%;
 		margin-left: -140px;
 		margin-top: -175px;
-		cursor: pointer;
+		cursor: grab;
+		user-select: none;
+		-webkit-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
 	}
 	
 	.project-card::before {
@@ -325,43 +342,43 @@
 			<div class="carousel" id="carousel">
 				<div class="project-card" data-index="0">
 					<div class="reflection"></div>
-					<h3>Project Alpha</h3>
+					<h3>Project #1</h3>
 					<p>A revolutionary approach to solving complex problems with elegant solutions that push the boundaries of what's possible.</p>
 					<a href="#" class="project-link">Learn More</a>
 				</div>
 				<div class="project-card" data-index="1">
 					<div class="reflection"></div>
-					<h3>Project Beta</h3>
+					<h3>Project #2</h3>
 					<p>Cutting-edge technology meets practical application in this innovative tool designed for modern workflows.</p>
 					<a href="#" class="project-link">Learn More</a>
 				</div>
 				<div class="project-card" data-index="2">
 					<div class="reflection"></div>
-					<h3>Project Gamma</h3>
+					<h3>Project #3</h3>
 					<p>Open-source contribution to the developer community with modern best practices and clean architecture.</p>
 					<a href="#" class="project-link">Learn More</a>
 				</div>
 				<div class="project-card" data-index="3">
 					<div class="reflection"></div>
-					<h3>Project Delta</h3>
+					<h3>Project #4</h3>
 					<p>Advanced analytics platform that transforms raw data into actionable insights for businesses of all sizes.</p>
 					<a href="#" class="project-link">Learn More</a>
 				</div>
 				<div class="project-card" data-index="4">
 					<div class="reflection"></div>
-					<h3>Project Epsilon</h3>
+					<h3>Project #5</h3>
 					<p>AI-powered automation suite that streamlines repetitive tasks and enhances productivity across teams.</p>
 					<a href="#" class="project-link">Learn More</a>
 				</div>
 				<div class="project-card" data-index="5">
 					<div class="reflection"></div>
-					<h3>Project Delta</h3>
+					<h3>Project #6</h3>
 					<p>Advanced analytics platform that transforms raw data into actionable insights for businesses of all sizes.</p>
 					<a href="#" class="project-link">Learn More</a>
 				</div>
 				<div class="project-card" data-index="6">
 					<div class="reflection"></div>
-					<h3>Project Epsilon</h3>
+					<h3>Project #7</h3>
 					<p>AI-powered automation suite that streamlines repetitive tasks and enhances productivity across teams.</p>
 					<a href="#" class="project-link">Learn More</a>
 				</div>
