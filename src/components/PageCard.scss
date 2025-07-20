@@ -1,0 +1,104 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+.page-card {
+  width: 100%;
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+
+  @include mobile {
+    padding: 0 1rem;
+    margin: 1rem auto;
+    min-height: 50vh;
+  }
+}
+
+.page-card-inner {
+  width: 100%;
+  background: linear-gradient(145deg, $bg-card, $bg-card-secondary);
+  border-radius: 20px;
+  padding: 3rem;
+  border: 1px solid rgba($accent-gold, 0.3);
+  @include card-shadow;
+  position: relative;
+  overflow: hidden;
+
+  // Glassmorphism highlight effect (same as project cards)
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+    border-radius: 20px 20px 0 0;
+    pointer-events: none;
+  }
+
+  @include mobile {
+    padding: 2rem 1.5rem;
+    border-radius: 15px;
+  }
+}
+
+.page-card-title {
+  color: $accent-gold;
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 1;
+
+  @include mobile {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+.page-card-content {
+  color: #fff;
+  line-height: 1.8;
+  font-size: 1.1rem;
+  position: relative;
+  z-index: 1;
+
+  p {
+    margin-bottom: 1.5rem;
+    opacity: 0.9;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  h3 {
+    color: $accent-gold;
+    font-size: 1.4rem;
+    margin: 2rem 0 1rem 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  ul, ol {
+    margin: 1.5rem 0;
+    padding-left: 2rem;
+    
+    li {
+      margin-bottom: 0.5rem;
+      opacity: 0.9;
+    }
+  }
+
+  @include mobile {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+}
