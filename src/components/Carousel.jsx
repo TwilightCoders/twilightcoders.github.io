@@ -1,92 +1,38 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigation } from '../contexts/NavigationContext';
+import { useGitHubData } from '../hooks/useGitHubData';
+import { useCardDealing } from '../hooks/useCardDealing';
+import { getLanguageColor } from '../services/githubApi';
 import './Carousel.scss';
 
-// Placeholder project data - we'll replace this with GitHub API data later
-const PLACEHOLDER_PROJECTS = [
-  {
-    id: 0,
-    name: "Project #1",
-    description: "A revolutionary approach to solving complex problems with elegant solutions that push the boundaries of what's possible.",
-    url: "#"
-  },
-  {
-    id: 1,
-    name: "Project #2", 
-    description: "Cutting-edge technology meets practical application in this innovative tool designed for modern workflows.",
-    url: "#"
-  },
-  {
-    id: 2,
-    name: "Project #3",
-    description: "Open-source contribution to the developer community with modern best practices and clean architecture.",
-    url: "#"
-  },
-  {
-    id: 3,
-    name: "Project #4",
-    description: "Advanced analytics platform that transforms raw data into actionable insights for businesses of all sizes.",
-    url: "#"
-  },
-  {
-    id: 4,
-    name: "Project #5",
-    description: "AI-powered automation suite that streamlines repetitive tasks and enhances productivity across teams.",
-    url: "#"
-  },
-  {
-    id: 5,
-    name: "Project #6",
-    description: "Advanced analytics platform that transforms raw data into actionable insights for businesses of all sizes.",
-    url: "#"
-  },
-  {
-    id: 6,
-    name: "Project #7",
-    description: "AI-powered automation suite that streamlines repetitive tasks and enhances productivity across teams.",
-    url: "#"
-  }
-];
-
 const Carousel = () => {
-  const [projects] = useState(PLACEHOLDER_PROJECTS);
+  const { repositories: projects, loading, error } = useGitHubData(6);
   const { isFirstHomeVisit } = useNavigation();
   
-  // Pick a random card to center on first visit only
-  const [rotation, setRotation] = useState(() => {
-    if (isFirstHomeVisit()) {
-      const randomCardIndex = Math.floor(Math.random() * PLACEHOLDER_PROJECTS.length);
-      const angleStep = 360 / PLACEHOLDER_PROJECTS.length;
-      return -randomCardIndex * angleStep;
-    } else {
-      // Return to first card on subsequent visits
-      return 0;
-    }
-  });
-  
+  // Card dealing and animation state
+  const {
+    cardOrder,
+    isStacked,
+    totalCards,
+    getCardTransform,
+    getCardClassName,
+    getCarouselPosition
+  } = useCardDealing(projects, isFirstHomeVisit);
+
+  // Carousel interaction state
+  const [rotation, setRotation] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [isStacked, setIsStacked] = useState(isFirstHomeVisit()); // Only stack on first visit
   const [hasDragged, setHasDragged] = useState(false);
   
+  // Refs for drag handling
   const startX = useRef(0);
   const currentX = useRef(0);
+  const baseRotation = useRef(0);
   const carouselRef = useRef(null);
   
-  const totalCards = projects.length;
-  const radiusX = 400; // Horizontal radius
-  const radiusZ = 200; // Depth radius
+  // Constants
   const threshold = 50; // Minimum drag distance to trigger navigation
-
-  // Fan out after 1.5 seconds only on first visit
-  useEffect(() => {
-    if (isFirstHomeVisit()) {
-      const timer = setTimeout(() => {
-        setIsStacked(false);
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [isFirstHomeVisit]);
 
   const updateCarousel = () => {
     setIsAnimating(true);
@@ -103,6 +49,7 @@ const Carousel = () => {
   };
 
   const handleStart = (e) => {
+    console.log('handleStart called', { isAnimating, isStacked });
     if (isAnimating) return;
     
     // Prevent default behavior to avoid text selection
@@ -111,6 +58,7 @@ const Carousel = () => {
     const clientX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
     startX.current = clientX;
     currentX.current = clientX;
+    baseRotation.current = rotation;
     setHasDragged(false);
     setIsDragging(false);
   };
@@ -130,9 +78,13 @@ const Carousel = () => {
       setHasDragged(true);
     }
     
-    if (!isDragging) return;
-    
-    e.preventDefault();
+    // Update rotation in real-time during drag for immediate feedback
+    if (Math.abs(deltaX) > 0) {
+      e.preventDefault();
+      const rotationDelta = (deltaX / window.innerWidth) * 360; // Full rotation across screen width
+      const newRotation = baseRotation.current + rotationDelta;
+      setRotation(newRotation);
+    }
   };
 
   const handleEnd = (e) => {
@@ -143,10 +95,10 @@ const Carousel = () => {
       setIsDragging(false);
       
       const deltaX = currentX.current - startX.current;
-      const rotationDelta = (deltaX / window.innerWidth) * 120;
+      const rotationDelta = (deltaX / window.innerWidth) * 360;
       
       // Update rotation based on drag
-      let newRotation = rotation + rotationDelta;
+      let newRotation = baseRotation.current + rotationDelta;
       
       // Optionally snap to show cards clearly
       if (Math.abs(deltaX) > threshold) {
@@ -156,6 +108,7 @@ const Carousel = () => {
       }
       
       setRotation(newRotation);
+      // Only animate on release, not during drag
       updateCarousel();
     }
     
@@ -219,84 +172,92 @@ const Carousel = () => {
     };
   }, [isDragging, rotation]);
 
-  const getCardTransform = (index) => {
-    if (isStacked) {
-      // Stack all cards on top of each other in center
-      return {
-        transform: `translate3d(0px, 0, ${index * 2}px) scale(1)`,
-        opacity: index === totalCards - 1 ? 1 : 0.8,
-        zIndex: index
-      };
-    } else {
-      // Calculate angle for this card in the oval
-      const angleStep = 360 / totalCards;
-      const angle = (index * angleStep + rotation) * Math.PI / 180;
-      
-      // Calculate oval position
-      const x = Math.sin(angle) * radiusX;
-      const z = Math.cos(angle) * radiusZ;
-      
-      // Calculate scale based on z-position (depth)
-      const normalizedZ = (z + radiusZ) / (radiusZ * 2); // 0 to 1
-      const scale = 0.6 + (normalizedZ * 0.4); // Scale from 0.6 to 1.0
-      const opacity = 0.4 + (normalizedZ * 0.6); // Opacity from 0.4 to 1.0
-      
-      // Calculate z-index (closer objects in front)
-      const zIndex = Math.round(50 + normalizedZ * 50);
-      
-      return {
-        transform: `translate3d(${x}px, 0, ${z}px) scale(${scale})`,
-        opacity: opacity,
-        zIndex: zIndex,
-        display: normalizedZ > 0.3 ? 'flex' : 'none' // Hide cards that are too far back
-      };
-    }
-  };
 
-  const getCardClassName = (index) => {
-    let className = 'project-card';
-    
-    if (isStacked) {
-      className += ' active';
-    } else {
-      const angleStep = 360 / totalCards;
-      const angle = (index * angleStep + rotation) * Math.PI / 180;
-      const z = Math.cos(angle) * radiusZ;
-      const normalizedZ = (z + radiusZ) / (radiusZ * 2);
-      
-      if (normalizedZ > 0.7) {
-        className += ' active';
-      } else if (normalizedZ > 0.3) {
-        className += ' side';
-      } else {
-        className += ' hidden';
-      }
-    }
-    
-    return className;
-  };
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="carousel-container">
+        <div className="carousel-loading">
+          <div className="loading-spinner"></div>
+          <p>Loading projects...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state with fallback
+  if (error && projects.length === 0) {
+    return (
+      <div className="carousel-container">
+        <div className="carousel-error">
+          <p>Unable to load live projects. Showing examples...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`carousel-container ${isDragging ? 'dragging' : ''}`}>
       <div className="carousel" ref={carouselRef}>
-        {projects.map((project, index) => {
-          const cardStyle = getCardTransform(index);
-          const cardClassName = getCardClassName(index);
+        {cardOrder.map((originalIndex, stackPosition) => {
+          const project = projects[originalIndex];
+          if (!project) return null;
+          
+          // Get carousel position (reverses order so top stack card goes to front)
+          const carouselPosition = getCarouselPosition(stackPosition);
+          
+          // Get styles and class names from the hook
+          const cardStyle = getCardTransform(stackPosition, carouselPosition, rotation);
+          const cardClassName = getCardClassName(stackPosition, carouselPosition, rotation);
           
           return (
             <div
               key={project.id}
-              className={cardClassName}
+              className="card-wrapper"
               style={cardStyle}
               onMouseDown={handleStart}
               onTouchStart={handleStart}
               onDragStart={(e) => e.preventDefault()}
-              onClick={(e) => handleCardClick(e, index)}
+              onClick={(e) => handleCardClick(e, carouselPosition)}
             >
+              <div className={cardClassName}>
               <div className="reflection"></div>
-              <h3>{project.name}</h3>
-              <p>{project.description}</p>
-              <a href={project.url} className="project-link">Learn More</a>
+              <div className="card-top-row">
+                {project.language && (
+                  <div 
+                    className="language-badge"
+                    style={{ borderColor: getLanguageColor(project.language) }}
+                  >
+                    <span 
+                      className="language-dot" 
+                      style={{ backgroundColor: getLanguageColor(project.language) }}
+                    ></span>
+                    {project.language}
+                  </div>
+                )}
+                {project.stars !== undefined && (
+                  <div className="stars-badge">
+                    <span>⭐</span>
+                    <span>{project.stars}</span>
+                  </div>
+                )}
+              </div>
+              <div className="project-header">
+                <h3>{project.displayName || project.name}</h3>
+              </div>
+              <p>{project.displayDescription}</p>
+              <div className="project-footer">
+                <a 
+                  href={project.url} 
+                  className="project-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {project.homepage ? 'Visit Site' : 'View Code'}
+                </a>
+              </div>
+              </div>
             </div>
           );
         })}
