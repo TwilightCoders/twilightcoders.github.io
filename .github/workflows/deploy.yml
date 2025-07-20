@@ -1,0 +1,55 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout private repo
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build project
+      run: npm run build
+      env:
+        NODE_ENV: production
+
+    - name: Verify build output
+      run: |
+        echo "Build completed successfully!"
+        echo "Build size:"
+        du -sh dist/
+        echo "Build contents:"
+        ls -la dist/
+
+    - name: Deploy to public repo
+      uses: peaceiris/actions-gh-pages@v3
+      if: github.ref == 'refs/heads/main'
+      with:
+        # You'll need to create a personal access token with repo permissions
+        # and add it as a secret named DEPLOY_TOKEN in this repo's settings
+        personal_token: ${{ secrets.DEPLOY_TOKEN }}
+        # Replace with your public repo name
+        external_repository: TwilightCoders/twilightcoders.github.io
+        publish_branch: main
+        publish_dir: ./dist
+        commit_message: 'Deploy from private repo: ${{ github.sha }}'
+        user_name: 'github-actions[bot]'
+        user_email: 'github-actions[bot]@users.noreply.github.com'
