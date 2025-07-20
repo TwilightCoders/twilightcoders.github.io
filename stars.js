@@ -85,7 +85,7 @@ function start() {
 
     var settings = {
         shootingStartInterval: function() {
-            return randomRange(300, 2000);
+            return randomRange(600, 4000); // Half as frequent
         },
         starsAngle: {
             min: 135,
@@ -114,9 +114,22 @@ function start() {
     }
 
     function createShootingStar() {
-        var shootingStar = particle.create(randomRange(width / 2, width), randomRange(0, height / 2), 0, 0);
+        // Vary the starting position
+        var startX = randomRange(0, width);
+        var startY = randomRange(0, height / 2);
+        
+        var shootingStar = particle.create(startX, startY, 0, 0);
         shootingStar.setSpeed(randomRange(settings.shootingStarSpeed.min, settings.shootingStarSpeed.max));
-        shootingStar.setHeading(degreesToRads(starsAngleRange()));
+        
+        // Random direction: either down-left (135-180) or down-right (0-45)
+        var angle;
+        if (Math.random() < 0.5) {
+            angle = randomRange(135, 180); // down-left (original)
+        } else {
+            angle = randomRange(0, 45);   // down-right
+        }
+        
+        shootingStar.setHeading(degreesToRads(angle));
         shootingStar.radius = shootingStarRadius;
         shootingStar.opacity = 0;
         shootingStar.trailLengthDelta = 0;

@@ -30,30 +30,18 @@ class InfiniteCarousel {
     }
     
     setupEventListeners() {
-        const container = this.carousel.parentElement; // carousel-container
-        
-        // Mouse events on container and cards
-        container.addEventListener('mousedown', this.handleStart.bind(this));
-        this.carousel.addEventListener('mousedown', this.handleStart.bind(this));
-        document.addEventListener('mousemove', this.handleMove.bind(this));
-        document.addEventListener('mouseup', this.handleEnd.bind(this));
-        
-        // Touch events on container and cards
-        container.addEventListener('touchstart', this.handleStart.bind(this), { passive: false });
-        this.carousel.addEventListener('touchstart', this.handleStart.bind(this), { passive: false });
-        document.addEventListener('touchmove', this.handleMove.bind(this), { passive: false });
-        document.addEventListener('touchend', this.handleEnd.bind(this));
-        
-        // Prevent default drag behavior
-        container.addEventListener('dragstart', e => e.preventDefault());
-        this.carousel.addEventListener('dragstart', e => e.preventDefault());
-        
-        // Add drag listeners to individual cards too
+        // Only add drag listeners to individual cards
         this.cards.forEach(card => {
             card.addEventListener('mousedown', this.handleStart.bind(this));
             card.addEventListener('touchstart', this.handleStart.bind(this), { passive: false });
             card.addEventListener('dragstart', e => e.preventDefault());
         });
+        
+        // Global movement and end events (these need to be on document)
+        document.addEventListener('mousemove', this.handleMove.bind(this));
+        document.addEventListener('mouseup', this.handleEnd.bind(this));
+        document.addEventListener('touchmove', this.handleMove.bind(this), { passive: false });
+        document.addEventListener('touchend', this.handleEnd.bind(this));
         
         // Keyboard navigation
         document.addEventListener('keydown', this.handleKeyboard.bind(this));
