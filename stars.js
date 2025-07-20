@@ -132,16 +132,19 @@ function start() {
     }
 
     function update() {
-        if (!paused) {
-            context.clearRect(0, 0, width, height);
-            context.fillStyle = "#282a3a";
-            context.fillRect(0, 0, width, height);
-            context.fill();
+        context.clearRect(0, 0, width, height);
+        context.fillStyle = "#282a3a";
+        context.fillRect(0, 0, width, height);
+        context.fill();
 
-            for (var i = 0; i < stars.length; i += 1) {
-                var star = stars[i];
+        // Always update and draw background stars, even when paused
+        for (var i = 0; i < stars.length; i += 1) {
+            var star = stars[i];
+            if (!paused) {
                 star.update();
-                drawStar(star);
+            }
+            drawStar(star);
+            if (!paused) {
                 if (star.x > width) {
                     star.x = 0;
                 }
@@ -155,38 +158,40 @@ function start() {
                     star.y = height;
                 }
             }
+        }
 
-            for (i = 0; i < shootingStars.length; i += 1) {
-                var shootingStar = shootingStars[i];
-                if (shootingStar.isSpawning) {
-                    shootingStar.opacity += shootingStarOpacityDelta;
-                    if (shootingStar.opacity >= 1.0) {
-                        shootingStar.isSpawning = false;
-                        killShootingStar(shootingStar);
-                    }
-                }
-                if (shootingStar.isDying) {
-                    shootingStar.opacity -= shootingStarOpacityDelta;
-                    if (shootingStar.opacity <= 0.0) {
-                        shootingStar.isDying = false;
-                        shootingStar.isDead = true;
-                    }
-                }
-                shootingStar.trailLengthDelta += trailLengthDelta;
-
-                shootingStar.update();
-                if (shootingStar.opacity > 0.0) {
-                    drawShootingStar(shootingStar);
+        // Always update shooting stars to finish their animations
+        for (i = 0; i < shootingStars.length; i += 1) {
+            var shootingStar = shootingStars[i];
+            if (shootingStar.isSpawning) {
+                shootingStar.opacity += shootingStarOpacityDelta;
+                if (shootingStar.opacity >= 1.0) {
+                    shootingStar.isSpawning = false;
+                    killShootingStar(shootingStar);
                 }
             }
-
-            //Delete dead shooting shootingStars
-            for (i = shootingStars.length -1; i >= 0 ; i--){
-                if (shootingStars[i].isDead){
-                    shootingStars.splice(i, 1);
+            if (shootingStar.isDying) {
+                shootingStar.opacity -= shootingStarOpacityDelta;
+                if (shootingStar.opacity <= 0.0) {
+                    shootingStar.isDying = false;
+                    shootingStar.isDead = true;
                 }
+            }
+            shootingStar.trailLengthDelta += trailLengthDelta;
+
+            shootingStar.update();
+            if (shootingStar.opacity > 0.0) {
+                drawShootingStar(shootingStar);
             }
         }
+
+        //Delete dead shooting shootingStars
+        for (i = shootingStars.length -1; i >= 0 ; i--){
+            if (shootingStars[i].isDead){
+                shootingStars.splice(i, 1);
+            }
+        }
+        
         requestAnimationFrame(update);
     }
 
@@ -242,20 +247,38 @@ function start() {
     //Run
     update();
 
+    let shootingStarTimer = null;
+
     function shootStar() {
-        // if (paused) return;
+        if (paused) return;
         createShootingStar();
-        setTimeout(shootStar, settings.shootingStartInterval());
+        shootingStarTimer = setTimeout(shootStar, settings.shootingStartInterval());
     }
 
-    shootStar();
+    function startShootingStars() {
+        if (shootingStarTimer) {
+            clearTimeout(shootingStarTimer);
+        }
+        shootStar();
+    }
+
+    function stopShootingStars() {
+        if (shootingStarTimer) {
+            clearTimeout(shootingStarTimer);
+            shootingStarTimer = null;
+        }
+    }
+
+    startShootingStars();
 
     window.onfocus = function () {
-      paused = false;
+        paused = false;
+        startShootingStars();
     };
 
     window.onblur = function () {
-      paused = true;
+        paused = true;
+        stopShootingStars();
     };
 
 }

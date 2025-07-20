@@ -1,7 +1,11 @@
-<html>
+<html lang="en">
 <head>
-	<title></title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Twilight Coders - Code in the Dark</title>
+	<meta name="description" content="Twilight Coders - An umbrella organization for innovative software projects and creative coding solutions">
 	<script type="text/javascript" src="stars.js"></script>
+	<script type="text/javascript" src="carousel.js"></script>
 	<style type="text/css">
 	html, body {
 		margin: 0px;
@@ -12,10 +16,363 @@
     canvas {
 		display: block;
 		position: absolute;
+		z-index: 1;
+	}
+	
+	.content-overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 2;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		text-align: center;
+		color: #fff;
+		font-family: 'Arial', sans-serif;
+		padding: 20px;
+		box-sizing: border-box;
+	}
+	
+	.logo {
+		font-size: 4rem;
+		font-weight: bold;
+		margin-bottom: 1rem;
+		background: linear-gradient(
+			135deg,
+			#e879f9 0%,
+			#d946ef 25%, 
+			#a855f7 50%,
+			#c084fc 75%,
+			#e879f9 100%
+		);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
+		text-shadow: 
+			0 1px 0 rgba(255,255,255,0.4),
+			0 2px 4px rgba(0,0,0,0.3),
+			0 4px 8px rgba(168,85,247,0.3);
+		filter: drop-shadow(0 8px 16px rgba(168,85,247,0.2));
+		position: relative;
+	}
+	
+	.logo::after {
+		content: 'Twilight Coders';
+		position: absolute;
+		top: 100%;
+		left: 0;
+		right: 0;
+		background: linear-gradient(
+			45deg,
+			transparent 0%,
+			rgba(232,121,249,0.3) 25%,
+			rgba(217,70,239,0.2) 50%,
+			rgba(168,85,247,0.1) 75%,
+			transparent 100%
+		);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
+		transform: scaleY(-0.6) translateY(-20px);
+		filter: blur(1px);
+		opacity: 0.4;
+		mask: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 80%);
+		-webkit-mask: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 80%);
+		pointer-events: none;
+	}
+	
+	.tagline {
+		font-size: 1.5rem;
+		margin-bottom: 3rem;
+		opacity: 0.9;
+		max-width: 600px;
+		text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+	}
+	
+	.projects-section {
+		background: rgba(40, 42, 58, 0.8);
+		border-radius: 10px;
+		padding: 2rem;
+		margin: 2rem 0;
+		max-width: 800px;
+		backdrop-filter: blur(5px);
+	}
+	
+	.projects-section h2 {
+		font-size: 2rem;
+		margin-bottom: 1.5rem;
+		color: #ffdd9d;
+	}
+	
+	.carousel-container {
+		position: relative;
+		width: 100%;
+		height: 500px;
+		margin: 2rem 0;
+		overflow: visible;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		perspective: 1000px;
+	}
+	
+	.carousel {
+		position: relative;
+		width: 900px;
+		height: 100%;
+		transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+		cursor: default;
+		transform-style: preserve-3d;
+		display: flex;
+		align-items: center;
+	}
+	
+	.project-card {
+		cursor: pointer;
+	}
+	
+	.carousel.dragging {
+		cursor: grabbing;
+		transition: none;
+		user-select: none;
+		-webkit-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+	}
+	
+	.carousel.dragging * {
+		user-select: none;
+		-webkit-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+	}
+	
+	.project-card {
+		position: absolute;
+		width: 280px;
+		height: 350px;
+		background: linear-gradient(145deg, rgba(40, 42, 58, 0.9), rgba(30, 32, 48, 0.8));
+		border-radius: 15px;
+		padding: 2rem 1.5rem;
+		border: 1px solid rgba(255, 221, 157, 0.3);
+		box-shadow: 
+			0 8px 32px rgba(0, 0, 0, 0.3),
+			inset 0 1px 0 rgba(255, 255, 255, 0.2);
+		transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.8s ease, filter 0.6s ease;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		text-align: center;
+		left: 50%;
+		top: 50%;
+		margin-left: -140px;
+		margin-top: -175px;
+		cursor: pointer;
+	}
+	
+	.project-card::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 40%;
+		background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+		border-radius: 15px 15px 0 0;
+		pointer-events: none;
+	}
+	
+	.project-card .reflection {
+		display: none;
+	}
+	
+	.project-card.active {
+		z-index: 10;
+		filter: brightness(1.1);
+	}
+	
+	.project-card.side {
+		opacity: 0.8;
+		filter: brightness(0.9);
+	}
+	
+	.project-card.hidden {
+		opacity: 0;
+		pointer-events: none;
+		visibility: hidden;
+		backdrop-filter: none !important;
+		filter: none !important;
+	}
+	
+	.project-card.hidden .reflection {
+		display: none;
+	}
+	
+	.project-card h3 {
+		color: #ffdd9d;
+		margin-bottom: 1rem;
+		font-size: 1.4rem;
+		font-weight: bold;
+		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+	}
+	
+	.project-card p {
+		opacity: 0.9;
+		line-height: 1.6;
+		margin-bottom: 2rem;
+		flex-grow: 1;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+	}
+	
+	.project-link {
+		color: #ffdd9d;
+		text-decoration: none;
+		font-weight: bold;
+		transition: all 0.3s ease;
+		padding: 0.8rem 1.5rem;
+		border: 2px solid rgba(255, 221, 157, 0.3);
+		border-radius: 25px;
+		background: rgba(255, 221, 157, 0.1);
+		display: inline-block;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+		font-size: 0.9rem;
+	}
+	
+	.project-link:hover {
+		color: #fff;
+		background: rgba(255, 221, 157, 0.2);
+		border-color: rgba(255, 221, 157, 0.6);
+		transform: translateY(-2px);
+		box-shadow: 0 4px 15px rgba(255, 221, 157, 0.3);
+	}
+	
+	.contact-section {
+		margin-top: 3rem;
+	}
+	
+	.contact-links {
+		display: flex;
+		gap: 2rem;
+		justify-content: center;
+		flex-wrap: wrap;
+	}
+	
+	.contact-link {
+		color: #ffdd9d;
+		text-decoration: none;
+		font-size: 1.1rem;
+		transition: color 0.3s ease;
+		padding: 0.5rem 1rem;
+		border: 1px solid rgba(255, 221, 157, 0.3);
+		border-radius: 25px;
+		background: rgba(255, 255, 255, 0.05);
+	}
+	
+	.contact-link:hover {
+		color: #fff;
+		background: rgba(255, 221, 157, 0.1);
+	}
+	
+	@media (max-width: 768px) {
+		.logo {
+			font-size: 2.5rem;
+		}
+		
+		.tagline {
+			font-size: 1.2rem;
+		}
+		
+		.projects-section {
+			margin: 1rem;
+			padding: 1.5rem;
+		}
+		
+		.carousel-container {
+			height: 300px;
+		}
+		
+		.project-card {
+			width: 240px;
+			height: 280px;
+			margin-left: -120px;
+			margin-top: -140px;
+			padding: 1.5rem 1rem;
+		}
+		
+		.contact-links {
+			gap: 1rem;
+		}
 	}
 	</style>
 </head>
 <body>
 <canvas id="canvas" width="100%" height="100%"></canvas>
+
+<div class="content-overlay">
+	<h1 class="logo">Twilight Coders</h1>
+	<p class="tagline">Dream. Code.</p>
+	
+	<div class="projects-section">
+		<div class="carousel-container">
+			<div class="carousel" id="carousel">
+				<div class="project-card" data-index="0">
+					<div class="reflection"></div>
+					<h3>Project Alpha</h3>
+					<p>A revolutionary approach to solving complex problems with elegant solutions that push the boundaries of what's possible.</p>
+					<a href="#" class="project-link">Learn More</a>
+				</div>
+				<div class="project-card" data-index="1">
+					<div class="reflection"></div>
+					<h3>Project Beta</h3>
+					<p>Cutting-edge technology meets practical application in this innovative tool designed for modern workflows.</p>
+					<a href="#" class="project-link">Learn More</a>
+				</div>
+				<div class="project-card" data-index="2">
+					<div class="reflection"></div>
+					<h3>Project Gamma</h3>
+					<p>Open-source contribution to the developer community with modern best practices and clean architecture.</p>
+					<a href="#" class="project-link">Learn More</a>
+				</div>
+				<div class="project-card" data-index="3">
+					<div class="reflection"></div>
+					<h3>Project Delta</h3>
+					<p>Advanced analytics platform that transforms raw data into actionable insights for businesses of all sizes.</p>
+					<a href="#" class="project-link">Learn More</a>
+				</div>
+				<div class="project-card" data-index="4">
+					<div class="reflection"></div>
+					<h3>Project Epsilon</h3>
+					<p>AI-powered automation suite that streamlines repetitive tasks and enhances productivity across teams.</p>
+					<a href="#" class="project-link">Learn More</a>
+				</div>
+				<div class="project-card" data-index="5">
+					<div class="reflection"></div>
+					<h3>Project Delta</h3>
+					<p>Advanced analytics platform that transforms raw data into actionable insights for businesses of all sizes.</p>
+					<a href="#" class="project-link">Learn More</a>
+				</div>
+				<div class="project-card" data-index="6">
+					<div class="reflection"></div>
+					<h3>Project Epsilon</h3>
+					<p>AI-powered automation suite that streamlines repetitive tasks and enhances productivity across teams.</p>
+					<a href="#" class="project-link">Learn More</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="contact-section">
+		<div class="contact-links">
+			<a href="#" class="contact-link">GitHub</a>
+			<a href="#" class="contact-link">Contact</a>
+			<a href="#" class="contact-link">Blog</a>
+		</div>
+	</div>
+</div>
 </body>
 </html>
