@@ -71,6 +71,7 @@ const Carousel = () => {
   
   const startX = useRef(0);
   const currentX = useRef(0);
+  const baseRotation = useRef(0);
   const carouselRef = useRef(null);
   
   const totalCards = projects.length;
@@ -111,6 +112,7 @@ const Carousel = () => {
     const clientX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
     startX.current = clientX;
     currentX.current = clientX;
+    baseRotation.current = rotation;
     setHasDragged(false);
     setIsDragging(false);
   };
@@ -130,9 +132,14 @@ const Carousel = () => {
       setHasDragged(true);
     }
     
-    if (!isDragging) return;
-    
-    e.preventDefault();
+    // Always update rotation during any movement, regardless of isDragging state
+    // This prevents interruption issues with async state updates
+    if (Math.abs(deltaX) > 0) {
+      e.preventDefault();
+      const rotationDelta = (deltaX / window.innerWidth) * 360; // Full rotation across screen width
+      const newRotation = baseRotation.current + rotationDelta;
+      setRotation(newRotation);
+    }
   };
 
   const handleEnd = (e) => {
@@ -143,10 +150,10 @@ const Carousel = () => {
       setIsDragging(false);
       
       const deltaX = currentX.current - startX.current;
-      const rotationDelta = (deltaX / window.innerWidth) * 120;
+      const rotationDelta = (deltaX / window.innerWidth) * 360;
       
       // Update rotation based on drag
-      let newRotation = rotation + rotationDelta;
+      let newRotation = baseRotation.current + rotationDelta;
       
       // Optionally snap to show cards clearly
       if (Math.abs(deltaX) > threshold) {
@@ -156,7 +163,7 @@ const Carousel = () => {
       }
       
       setRotation(newRotation);
-      updateCarousel();
+      // Don't call updateCarousel() - let rotation be immediate without animation
     }
     
     // Reset all drag tracking
