@@ -1,0 +1,33 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+.navigation {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  z-index: 1000; // Highest z-index to stay above all page transitions
+  display: flex;
+  gap: 1rem;
+}
+
+.nav-link {
+  color: $accent-gold;
+  text-decoration: none;
+  font-size: 1.1rem;
+  transition: color $transition-fast ease;
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba($accent-gold, 0.3);
+  border-radius: 25px;
+  background: rgba(255, 255, 255, 0.05);
+  
+  &:hover {
+    color: #fff;
+    background: rgba($accent-gold, 0.1);
+    border-color: rgba($accent-gold, 0.6);
+  }
+  
+  @include mobile {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
