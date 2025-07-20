@@ -47,7 +47,7 @@
   padding: 2rem 1.5rem;
   border: 1px solid rgba($accent-gold, 0.3);
   @include card-shadow;
-  transition: transform $transition-fast $transition-smooth, 
+  transition: transform $transition-carousel $transition-smooth, 
               opacity $transition-fast ease, 
               filter $transition-fast ease;
   display: flex;
@@ -101,6 +101,12 @@
     .reflection {
       display: none;
     }
+  }
+
+  &.dealing {
+    transition: transform $transition-dealing-time $transition-dealing, 
+                opacity $transition-fast ease, 
+                filter $transition-fast ease;
   }
 
   h3 {

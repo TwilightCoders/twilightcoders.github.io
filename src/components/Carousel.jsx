@@ -52,6 +52,19 @@ const Carousel = () => {
   const [projects] = useState(PLACEHOLDER_PROJECTS);
   const { isFirstHomeVisit } = useNavigation();
   
+  // Generate random rotations and positions for each card in the stack (only on first visit)
+  const [stackTransforms] = useState(() => {
+    if (isFirstHomeVisit()) {
+      // Pre-generate transforms for cards
+      return Array.from({ length: PLACEHOLDER_PROJECTS.length }, () => ({
+        rotation: (Math.random() - 0.5) * 30, // Random rotation between -15° and 15°
+        offsetX: (Math.random() - 0.5) * 40,  // Random X offset between -20px and 20px
+        offsetY: (Math.random() - 0.5) * 20   // Random Y offset between -10px and 10px
+      }));
+    }
+    return [];
+  });
+
   // Pick a random card to center on first visit only
   const [rotation, setRotation] = useState(() => {
     if (isFirstHomeVisit()) {
@@ -67,6 +80,7 @@ const Carousel = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isStacked, setIsStacked] = useState(isFirstHomeVisit()); // Only stack on first visit
+  const [isDealing, setIsDealing] = useState(isFirstHomeVisit()); // Track dealing animation
   const [hasDragged, setHasDragged] = useState(false);
   
   const startX = useRef(0);
@@ -84,6 +98,10 @@ const Carousel = () => {
     if (isFirstHomeVisit()) {
       const timer = setTimeout(() => {
         setIsStacked(false);
+        // End dealing animation after the cards have spread out
+        setTimeout(() => {
+          setIsDealing(false);
+        }, 1200); // Wait for dealing transition to complete
       }, 1500);
       return () => clearTimeout(timer);
     }
@@ -228,11 +246,13 @@ const Carousel = () => {
 
   const getCardTransform = (index) => {
     if (isStacked) {
-      // Stack all cards on top of each other in center
+      // Stack cards with random rotation and slight position offsets for disorganized look
+      const transform = stackTransforms[index] || { rotation: 0, offsetX: 0, offsetY: 0 };
+      
       return {
-        transform: `translate3d(0px, 0, ${index * 2}px) scale(1)`,
-        opacity: index === totalCards - 1 ? 1 : 0.8,
-        zIndex: index
+        transform: `translate3d(${transform.offsetX}px, ${transform.offsetY}px, ${index * 2}px) rotate(${transform.rotation}deg)`,
+        opacity: 1, // Full opacity in stack
+        zIndex: index // Higher index = on top of stack
       };
     } else {
       // Calculate angle for this card in the oval
@@ -262,6 +282,11 @@ const Carousel = () => {
 
   const getCardClassName = (index) => {
     let className = 'project-card';
+    
+    // Add dealing class during the initial animation
+    if (isDealing) {
+      className += ' dealing';
+    }
     
     if (isStacked) {
       className += ' active';
