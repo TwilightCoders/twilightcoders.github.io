@@ -109,20 +109,81 @@
                 filter $transition-fast ease;
   }
 
-  h3 {
-    color: $accent-gold;
+  .card-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.8rem;
+    position: relative;
+    z-index: 10;
+    margin-top: -0.5rem;
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+    pointer-events: none; // Allow drag events to pass through
+  }
+
+  .stars-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(0, 0, 0, 0.4);
+    padding: 0.2rem 0.4rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    font-weight: 500;
+    pointer-events: auto; // Re-enable for the badge itself
+  }
+
+  .project-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin-bottom: 1rem;
-    font-size: 1.4rem;
-    font-weight: bold;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    
+    h3 {
+      color: $accent-gold;
+      margin-bottom: 0.5rem;
+      font-size: 1.4rem;
+      font-weight: bold;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+      text-align: center;
+    }
+  }
+
+  .language-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(0, 0, 0, 0.4);
+    padding: 0.2rem 0.4rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    pointer-events: auto; // Re-enable for the badge itself
+
+    .language-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      filter: saturate(1.4) brightness(1.2);
+    }
   }
 
   p {
     opacity: 0.9;
     line-height: 1.6;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     flex-grow: 1;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .project-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   @include mobile {
@@ -132,6 +193,42 @@
     margin-top: -140px;
     padding: 1.5rem 1rem;
   }
+}
+
+// Loading and error states
+.carousel-loading,
+.carousel-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: $carousel-height;
+  color: #fff;
+  text-align: center;
+
+  p {
+    margin-top: 1rem;
+    font-size: 1.1rem;
+    opacity: 0.8;
+  }
+
+  @include mobile {
+    height: 300px;
+  }
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba($accent-gold, 0.3);
+  border-top: 3px solid $accent-gold;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .project-link {

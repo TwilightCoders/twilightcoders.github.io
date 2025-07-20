@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigation } from '../contexts/NavigationContext';
+import { useGitHubData } from '../hooks/useGitHubData';
+import { getLanguageColor } from '../services/githubApi';
 import './Carousel.scss';
 
 // Placeholder project data - we'll replace this with GitHub API data later
@@ -49,14 +51,17 @@ const PLACEHOLDER_PROJECTS = [
 ];
 
 const Carousel = () => {
-  const [projects] = useState(PLACEHOLDER_PROJECTS);
+  const { repositories: projects, loading, error } = useGitHubData(6);
   const { isFirstHomeVisit } = useNavigation();
   
   // Generate random rotations and positions for each card in the stack (only on first visit)
+  // CRITICAL: These transforms must be completely stable and never change after initialization
+  // to prevent CSS transform coordinate system issues that break button click detection.
+  // We achieve randomization by shuffling the projects array below, not by changing these transforms.
   const [stackTransforms] = useState(() => {
     if (isFirstHomeVisit()) {
-      // Pre-generate transforms for cards
-      return Array.from({ length: PLACEHOLDER_PROJECTS.length }, () => ({
+      // Pre-generate transforms for up to 10 cards (will work even if fewer projects load)
+      return Array.from({ length: 10 }, () => ({
         rotation: (Math.random() - 0.5) * 30, // Random rotation between -15° and 15°
         offsetX: (Math.random() - 0.5) * 40,  // Random X offset between -20px and 20px
         offsetY: (Math.random() - 0.5) * 20   // Random Y offset between -10px and 10px
@@ -65,11 +70,36 @@ const Carousel = () => {
     return [];
   });
 
+  // Shuffle projects array on first visit for random dealing order
+  // This approach maintains transform stability while achieving perfect randomization
+  // by transforming the data rather than the transforms themselves.
+  const [shuffledProjects, setShuffledProjects] = useState([]);
+  
+  useEffect(() => {
+    if (projects.length > 0 && shuffledProjects.length === 0) {
+      if (isFirstHomeVisit()) {
+        // Shuffle the projects array for random dealing
+        const shuffled = [...projects];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        setShuffledProjects(shuffled);
+      } else {
+        // Keep original order on subsequent visits
+        setShuffledProjects([...projects]);
+      }
+    }
+  }, [projects, shuffledProjects.length, isFirstHomeVisit]);
+
+  // Use shuffled projects for rendering
+  const displayProjects = shuffledProjects.length > 0 ? shuffledProjects : projects;
+
   // Pick a random card to center on first visit only
   const [rotation, setRotation] = useState(() => {
     if (isFirstHomeVisit()) {
-      const randomCardIndex = Math.floor(Math.random() * PLACEHOLDER_PROJECTS.length);
-      const angleStep = 360 / PLACEHOLDER_PROJECTS.length;
+      const randomCardIndex = Math.floor(Math.random() * 6); // Assume up to 6 projects
+      const angleStep = 360 / 6;
       return -randomCardIndex * angleStep;
     } else {
       // Return to first card on subsequent visits
@@ -88,7 +118,7 @@ const Carousel = () => {
   const baseRotation = useRef(0);
   const carouselRef = useRef(null);
   
-  const totalCards = projects.length;
+  const totalCards = displayProjects.length;
   const radiusX = 450; // Horizontal radius - increased for better spacing
   const radiusZ = 250; // Depth radius - increased for more depth effect
   const threshold = 50; // Minimum drag distance to trigger navigation
@@ -308,10 +338,33 @@ const Carousel = () => {
     return className;
   };
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="carousel-container">
+        <div className="carousel-loading">
+          <div className="loading-spinner"></div>
+          <p>Loading projects...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state with fallback
+  if (error && displayProjects.length === 0) {
+    return (
+      <div className="carousel-container">
+        <div className="carousel-error">
+          <p>Unable to load live projects. Showing examples...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`carousel-container ${isDragging ? 'dragging' : ''}`}>
       <div className="carousel" ref={carouselRef}>
-        {projects.map((project, index) => {
+        {displayProjects.map((project, index) => {
           const cardStyle = getCardTransform(index);
           const cardClassName = getCardClassName(index);
           
@@ -326,9 +379,41 @@ const Carousel = () => {
               onClick={(e) => handleCardClick(e, index)}
             >
               <div className="reflection"></div>
-              <h3>{project.name}</h3>
-              <p>{project.description}</p>
-              <a href={project.url} className="project-link">Learn More</a>
+              <div className="card-top-row">
+                {project.language && (
+                  <div 
+                    className="language-badge"
+                    style={{ borderColor: getLanguageColor(project.language) }}
+                  >
+                    <span 
+                      className="language-dot" 
+                      style={{ backgroundColor: getLanguageColor(project.language) }}
+                    ></span>
+                    {project.language}
+                  </div>
+                )}
+                {project.stars !== undefined && (
+                  <div className="stars-badge">
+                    <span>⭐</span>
+                    <span>{project.stars}</span>
+                  </div>
+                )}
+              </div>
+              <div className="project-header">
+                <h3>{project.displayName || project.name}</h3>
+              </div>
+              <p>{project.displayDescription}</p>
+              <div className="project-footer">
+                <a 
+                  href={project.url} 
+                  className="project-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {project.homepage ? 'Visit Site' : 'View Code'}
+                </a>
+              </div>
             </div>
           );
         })}
