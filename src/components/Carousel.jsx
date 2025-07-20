@@ -74,8 +74,8 @@ const Carousel = () => {
   const carouselRef = useRef(null);
   
   const totalCards = projects.length;
-  const radiusX = 400; // Horizontal radius
-  const radiusZ = 200; // Depth radius
+  const radiusX = 450; // Horizontal radius - increased for better spacing
+  const radiusZ = 250; // Depth radius - increased for more depth effect
   const threshold = 50; // Minimum drag distance to trigger navigation
 
   // Fan out after 1.5 seconds only on first visit
@@ -239,7 +239,7 @@ const Carousel = () => {
       // Calculate scale based on z-position (depth)
       const normalizedZ = (z + radiusZ) / (radiusZ * 2); // 0 to 1
       const scale = 0.6 + (normalizedZ * 0.4); // Scale from 0.6 to 1.0
-      const opacity = 0.4 + (normalizedZ * 0.6); // Opacity from 0.4 to 1.0
+      const opacity = 0.3 + (normalizedZ * 0.7); // Opacity from 0.3 to 1.0 - wider range
       
       // Calculate z-index (closer objects in front)
       const zIndex = Math.round(50 + normalizedZ * 50);
@@ -248,7 +248,7 @@ const Carousel = () => {
         transform: `translate3d(${x}px, 0, ${z}px) scale(${scale})`,
         opacity: opacity,
         zIndex: zIndex,
-        display: normalizedZ > 0.3 ? 'flex' : 'none' // Hide cards that are too far back
+        display: normalizedZ > 0.2 ? 'flex' : 'none' // Show more cards by lowering threshold
       };
     }
   };
