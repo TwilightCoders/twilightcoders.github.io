@@ -1,5 +1,6 @@
 @import 'variables';
 @import 'mixins';
+@import 'page-slider';
 
 // Global styles
 html, body {
@@ -51,20 +52,20 @@ html, body {
   z-index: $z-content;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   text-align: center;
   color: #fff;
-  padding: 20px;
+  padding: 2rem 1rem 1rem 1rem;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: hidden; // Prevent content from showing outside viewport
 }
 
 // Logo styles
 .logo {
   font-size: 4rem;
   font-weight: bold;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
+  flex-shrink: 0; // Prevent logo from shrinking
   @include gradient-text(
     $bright-purple 0%,
     #d946ef 25%, 
