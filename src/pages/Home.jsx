@@ -5,7 +5,6 @@ const Home = () => {
   return (
     <PageTransition>
       <div className="content-overlay">
-        <h1 className="logo" data-text="TWILIGHT CODERS">TWILIGHT CODERS</h1>
         <p className="tagline">Dream. Code.</p>
         
         <div className="projects-section">
