@@ -98,6 +98,7 @@ const PageSlider = () => {
   return (
     <div className="content-overlay">
       <h1 className="logo" data-text="TWILIGHT CODERS">TWILIGHT CODERS</h1>
+      <p className="tagline">Dream. Code.</p>
       
       <motion.ul
         className="page-slider"
