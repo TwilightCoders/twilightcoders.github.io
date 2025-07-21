@@ -1,0 +1,49 @@
+@import 'variables';
+@import 'mixins';
+
+.page-slider {
+  display: flex;
+  width: 300vw; // 3 pages side by side, each taking full viewport width
+  flex: 1; // Take remaining space after header
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  
+  // Remove mobile styling for now - keep horizontal layout
+  // @include mobile {
+  //   // On mobile, stack vertically instead of horizontally
+  //   flex-direction: column;
+  //   width: 100%;
+  //   height: 300%; // 3 pages stacked vertically
+  // }
+}
+
+.page-slide {
+  width: 100vw; // Each page takes full viewport width
+  height: 100vh; // Full viewport height to ensure proper layout calculation
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; // Align to top instead of center
+  padding-top: 8rem; // More space to account for the fixed header
+  box-sizing: border-box; // Include padding in height calculation
+  overflow: hidden; // Clip any content that goes outside this slide
+  
+  // Better clipping during transitions
+  clip-path: inset(0 0 0 0);
+  
+  // Remove mobile styling for now - keep horizontal layout
+  // @include mobile {
+  //   // On mobile, each page takes full width but 1/3 height
+  //   width: 100%;
+  //   height: 33.333%;
+  // }
+}
+
+// Adjust content overlay for the new structure
+.content-overlay {
+  .projects-section {
+    // Remove the margin-bottom since we now have a shared header
+    margin-bottom: 0;
+  }
+}
