@@ -86,7 +86,7 @@ const StarsCanvas = () => {
 
     const settings = {
       shootingStartInterval: function() {
-        return randomRange(600, 4000); // Half as frequent
+        return randomRange(400, 2500); // Increased frequency
       },
       starsAngle: {
         min: 135,
