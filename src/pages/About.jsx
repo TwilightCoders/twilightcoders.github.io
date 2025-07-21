@@ -5,34 +5,25 @@ const About = () => {
   return (
     <PageTransition>
       <div className="content-overlay">
-        <h1 className="logo" data-text="TWILIGHT CODERS">TWILIGHT CODERS</h1>
-        
         <PageCard title="About Us">
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor 
-            incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud 
-            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            We're a creative development collective focused on building innovative web solutions 
+            and contributing to the open-source community. Our passion lies in crafting elegant 
+            code that solves real problems and pushes the boundaries of what's possible.
           </p>
           
-          <h3>Our Mission</h3>
-          <p>
-            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
-            fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in 
-            culpa qui officia deserunt mollit anim id est laborum.
-          </p>
-          
-          <h3>What We Do</h3>
+          <h3>What We Create</h3>
           <ul>
-            <li>Innovative software development and creative coding solutions</li>
-            <li>Open-source contributions to the developer community</li>
-            <li>Modern architecture and best practices implementation</li>
-            <li>AI-powered automation and productivity tools</li>
+            <li>Modern web applications with cutting-edge technologies</li>
+            <li>Open-source tools and libraries for developers</li>
+            <li>Automation solutions that enhance productivity</li>
+            <li>Creative experiments that explore new possibilities</li>
           </ul>
           
           <p>
-            Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque 
-            laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi 
-            architecto beatae vitae dicta sunt explicabo.
+            From React applications to Ruby gems, from AI integrations to developer tools—we 
+            believe in the power of thoughtful engineering and clean architecture to create 
+            software that stands the test of time.
           </p>
         </PageCard>
       </div>

@@ -5,41 +5,33 @@ const Contact = () => {
   return (
     <PageTransition>
       <div className="content-overlay">
-        <h1 className="logo" data-text="TWILIGHT CODERS">TWILIGHT CODERS</h1>
-        
         <PageCard title="Get In Touch">
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor 
-            incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud 
-            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            Interested in collaborating, have questions about our projects, or want to discuss 
+            a development opportunity? We'd love to hear from you.
           </p>
           
-          <h3>Ways to Reach Us</h3>
-          <p>
-            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
-            fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in 
-            culpa qui officia deserunt mollit anim id est laborum.
-          </p>
+          <h3>Connect With Us</h3>
+          <div className="contact-links">
+            <a href="https://github.com/TwilightCoders" className="contact-link" target="_blank" rel="noopener noreferrer">
+              GitHub
+            </a>
+            <a href="mailto:hello@twilightcoders.dev" className="contact-link">
+              Email
+            </a>
+          </div>
           
-          <h3>Collaboration Opportunities</h3>
+          <h3>What We're Looking For</h3>
           <ul>
-            <li>Open source project contributions and partnerships</li>
-            <li>Technical consulting and development services</li>
-            <li>Speaking engagements and workshop opportunities</li>
-            <li>Community building and developer relations</li>
+            <li>Open source collaborations and community contributions</li>
+            <li>Interesting technical challenges and innovative projects</li>
+            <li>Opportunities to share knowledge and learn from others</li>
+            <li>Creative partnerships that push the boundaries of development</li>
           </ul>
           
           <p>
-            Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia 
-            consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro 
-            quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.
-          </p>
-          
-          <h3>Response Time</h3>
-          <p>
-            At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium 
-            voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint 
-            occaecati cupiditate non provident.
+            Whether you're looking to contribute to our projects, need technical expertise, 
+            or just want to chat about code—drop us a line. We aim to respond within 24-48 hours.
           </p>
         </PageCard>
       </div>
