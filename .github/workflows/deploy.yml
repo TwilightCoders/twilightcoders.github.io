@@ -39,6 +39,12 @@ jobs:
         echo "Build contents:"
         ls -la dist/
 
+    - name: Add .nojekyll file
+      run: touch dist/.nojekyll
+
+    - name: Add CNAME file for custom domain
+      run: echo "twilightcoders.net" > dist/CNAME
+
     - name: Deploy to public repo
       uses: peaceiris/actions-gh-pages@v3
       if: github.ref == 'refs/heads/main'
@@ -53,3 +59,4 @@ jobs:
         commit_message: 'Deploy from private repo: ${{ github.sha }}'
         user_name: 'github-actions[bot]'
         user_email: 'github-actions[bot]@users.noreply.github.com'
+        keep_files: true  # This preserves existing files like CNAME
