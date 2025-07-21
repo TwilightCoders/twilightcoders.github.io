@@ -145,12 +145,25 @@ const getPinnedRepositories = async () => {
   return [...new Set([...manualPinned, ...homepagePinned])];
 };
 
+// Simple cache to avoid hitting rate limits
+const repositoryCache = {
+  data: null,
+  timestamp: null,
+  duration: 5 * 60 * 1000 // 5 minutes
+};
+
 /**
  * Fetch repositories for the TwilightCoders organization
  * @param {number} limit - Maximum number of repositories to fetch
  * @returns {Promise<Array>} Array of repository objects
  */
 export const fetchRepositories = async (limit = 6) => {
+  // Check cache first
+  if (repositoryCache.data && repositoryCache.timestamp && 
+      Date.now() - repositoryCache.timestamp < repositoryCache.duration) {
+    console.log('Using cached repository data');
+    return repositoryCache.data.slice(0, limit);
+  }
   try {
     // Fetch a larger set to ensure we have enough after filtering and sorting
     const response = await fetch(
@@ -225,6 +238,10 @@ export const fetchRepositories = async (limit = 6) => {
         };
       })
     );
+    
+    // Cache the results
+    repositoryCache.data = reposWithTitles;
+    repositoryCache.timestamp = Date.now();
     
     return reposWithTitles;
   } catch (error) {
