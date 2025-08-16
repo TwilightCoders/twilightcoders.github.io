@@ -1,8 +1,11 @@
 import { motion } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { useNavigation } from '../contexts/NavigationContext';
+import Navigation from './Navigation';
 import Carousel from './Carousel';
 import PageCard from './PageCard';
+import NewsletterSignup from './NewsletterSignup';
 
 const PAGE_ORDER = {
   '/': 0,
@@ -72,6 +75,8 @@ const PAGES = [
           <li>Creative partnerships that push the boundaries of development</li>
         </ul>
         
+        <NewsletterSignup />
+        
         <p>
           Whether you're looking to contribute to our projects, need technical expertise, 
           or just want to chat about code—drop us a line. We aim to respond within 24-48 hours.
@@ -85,44 +90,83 @@ const PAGES = [
 const PageSlider = () => {
   const location = useLocation();
   const { direction } = useNavigation();
+  const [isMobile, setIsMobile] = useState(false);
   
   const currentIndex = PAGE_ORDER[location.pathname] || 0;
   
-  // For now, just do horizontal sliding (we can add mobile detection later)
+  // Detect mobile viewport
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
   const getTransform = () => {
-    // Each page is 100vw wide, offset by -1 to align correctly
-    const adjustedIndex = currentIndex - 1;
-    return { x: `${-adjustedIndex * 100}vw` };
+    if (isMobile) {
+      // Mobile: vertical scrolling - no transform needed, let CSS handle it
+      return { x: 0, y: 0 };
+    } else {
+      // Desktop: horizontal sliding
+      const adjustedIndex = currentIndex - 1;
+      return { x: `${-adjustedIndex * 100}vw` };
+    }
   };
   
   return (
     <div className="content-overlay">
-      <h1 className="logo" data-text="TWILIGHT CODERS">TWILIGHT CODERS</h1>
-      <p className="tagline">Dream. Code.</p>
+      <div className="navigation-mobile">
+        <Navigation />
+      </div>
+      <div className="header-section">
+        <h1 className="logo" data-text="TWILIGHT CODERS">TWILIGHT CODERS</h1>
+        <p className="tagline">Dream. Code.</p>
+      </div>
       
-      <motion.ul
-        className="page-slider"
-        initial={getTransform()} // Set initial position immediately to prevent flash
-        animate={getTransform()}
-        transition={{
-          duration: 0.4 * Math.abs(direction || 1),
-          ease: [0.4, 0.0, 0.2, 1]
-        }}
-      >
-        {PAGES.map(({ path, title, content, isHomePage }, index) => (
-          <li key={path} className="page-slide">
-            {isHomePage ? (
-              <div className="projects-section">
-                {content}
-              </div>
-            ) : (
-              <PageCard title={title}>
-                {content}
-              </PageCard>
-            )}
-          </li>
-        ))}
-      </motion.ul>
+      {isMobile ? (
+        <ul className="page-slider">
+          {PAGES.map(({ path, title, content, isHomePage }, index) => (
+            <li key={path} className="page-slide">
+              {isHomePage ? (
+                <div className="projects-section">
+                  {content}
+                </div>
+              ) : (
+                <PageCard title={title}>
+                  {content}
+                </PageCard>
+              )}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <motion.ul
+          className="page-slider"
+          initial={getTransform()} // Set initial position immediately to prevent flash
+          animate={getTransform()}
+          transition={{
+            duration: 0.4 * Math.abs(direction || 1),
+            ease: [0.4, 0.0, 0.2, 1]
+          }}
+        >
+          {PAGES.map(({ path, title, content, isHomePage }, index) => (
+            <li key={path} className="page-slide">
+              {isHomePage ? (
+                <div className="projects-section">
+                  {content}
+                </div>
+              ) : (
+                <PageCard title={title}>
+                  {content}
+                </PageCard>
+              )}
+            </li>
+          ))}
+        </motion.ul>
+      )}
     </div>
   );
 };

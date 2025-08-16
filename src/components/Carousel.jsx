@@ -119,8 +119,8 @@ const Carousel = () => {
   const carouselRef = useRef(null);
   
   const totalCards = displayProjects.length;
-  const radiusX = 450; // Horizontal radius - increased for better spacing
-  const radiusZ = 250; // Depth radius - increased for more depth effect
+  const radiusX = 550; // Horizontal radius - balanced spacing for desktop
+  const radiusZ = 300; // Depth radius - balanced depth effect
   const threshold = 50; // Minimum drag distance to trigger navigation
 
   // Fan out after 1.5 seconds only on first visit
@@ -152,6 +152,8 @@ const Carousel = () => {
   };
 
   const handleStart = (e) => {
+    // Disable drag on mobile
+    if (window.innerWidth <= 768) return;
     if (isAnimating) return;
     
     // Prevent default behavior to avoid text selection
@@ -166,6 +168,8 @@ const Carousel = () => {
   };
 
   const handleMove = (e) => {
+    // Disable drag on mobile
+    if (window.innerWidth <= 768) return;
     // Only process if we actually started a drag on a card
     if (startX.current === 0) return;
     
@@ -191,6 +195,8 @@ const Carousel = () => {
   };
 
   const handleEnd = (e) => {
+    // Disable drag on mobile
+    if (window.innerWidth <= 768) return;
     // Only process if we actually started a drag on a card
     if (startX.current === 0) return;
     
@@ -225,6 +231,11 @@ const Carousel = () => {
   };
 
   const handleCardClick = (e, index) => {
+    // On mobile, disable card click navigation (let links work normally)
+    if (window.innerWidth <= 768) {
+      return;
+    }
+    
     // Only handle clicks if we haven't dragged and not stacked
     if (hasDragged || isStacked || isAnimating) {
       return;
@@ -275,6 +286,9 @@ const Carousel = () => {
   }, [isDragging, rotation]);
 
   const getCardTransform = (index) => {
+    // Check if mobile
+    const isMobile = window.innerWidth <= 768;
+    
     if (isStacked) {
       // Stack cards with random rotation and slight position offsets for disorganized look
       const transform = stackTransforms[index] || { rotation: 0, offsetX: 0, offsetY: 0 };
@@ -284,8 +298,32 @@ const Carousel = () => {
         opacity: 1, // Full opacity in stack
         zIndex: index // Higher index = on top of stack
       };
+    } else if (isMobile) {
+      // Mobile layout - use flat positioning like desktop but with mobile spacing
+      const angleStep = 360 / totalCards;
+      const angle = (index * angleStep + rotation) * Math.PI / 180;
+      
+      // Use smaller radius for mobile
+      const mobileRadiusX = 180;
+      const x = Math.sin(angle) * mobileRadiusX;
+      
+      // Simple depth calculation for mobile
+      const z = Math.cos(angle) * 100;
+      const normalizedZ = (z + 100) / 200; // 0 to 1
+      const scale = 0.7 + (normalizedZ * 0.3); // Scale from 0.7 to 1.0
+      const opacity = 0.4 + (normalizedZ * 0.6); // Opacity from 0.4 to 1.0
+      
+      // Z-index for proper layering
+      const zIndex = Math.round(50 + normalizedZ * 50);
+      
+      return {
+        transform: `translateX(${x}px) scale(${scale})`,
+        opacity: opacity,
+        zIndex: zIndex,
+        display: normalizedZ > 0.3 ? 'flex' : 'none' // Show more cards
+      };
     } else {
-      // Calculate angle for this card in the oval
+      // Desktop oval layout
       const angleStep = 360 / totalCards;
       const angle = (index * angleStep + rotation) * Math.PI / 180;
       

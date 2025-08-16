@@ -1,3 +1,4 @@
+@use 'sass:math';
 @import '../styles/variables';
 @import '../styles/mixins';
 
@@ -12,7 +13,10 @@
   perspective: 1000px;
 
   @include mobile {
-    height: 300px;
+    height: $mobile-carousel-height;
+    padding: 0;
+    margin-top: -5vh;
+    overflow: visible; // Show cards properly on mobile
   }
 }
 
@@ -26,6 +30,11 @@
   display: flex;
   align-items: center;
   @include no-select;
+
+  @include mobile {
+    width: 100vw;
+    transform-style: flat; // Use flat transforms on mobile for simpler layout
+  }
 
   &.dragging {
     cursor: grabbing;
@@ -56,8 +65,8 @@
   text-align: center;
   left: 50%;
   top: 50%;
-  margin-left: -#{$card-width / 2};
-  margin-top: -#{$card-height / 2};
+  margin-left: -#{math.div($card-width, 2)};
+  margin-top: -#{math.div($card-height, 2)};
   cursor: grab;
   @include no-select;
 
@@ -187,10 +196,36 @@
   }
 
   @include mobile {
-    width: 240px;
-    height: 280px;
-    margin-left: -120px;
-    margin-top: -140px;
+    width: $mobile-card-width;
+    height: $mobile-card-height;
+    margin-left: -#{math.div($mobile-card-width, 2)};
+    margin-top: -#{math.div($mobile-card-height, 2)};
+    padding: 1.5rem 1rem;
+    
+    .project-header h3 {
+      font-size: 1.4rem;
+    }
+    
+    p {
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+    
+    .project-link {
+      padding: 0.8rem 1.5rem;
+      font-size: 0.9rem;
+      
+      svg {
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
+  
+  @include small-mobile {
+    width: 85vw;
+    max-width: 300px;
+    height: 360px;
     padding: 1.5rem 1rem;
   }
 }
@@ -213,7 +248,7 @@
   }
 
   @include mobile {
-    height: 300px;
+    height: $mobile-carousel-height;
   }
 }
 
@@ -276,6 +311,12 @@
 
   @include mobile {
     gap: 1rem;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  @include small-mobile {
+    gap: 0.8rem;
   }
 }
 
@@ -292,5 +333,18 @@
   &:hover {
     color: #fff;
     background: rgba($accent-gold, 0.1);
+  }
+  
+  @include mobile {
+    font-size: 1rem;
+    padding: 0.6rem 1.2rem;
+    text-align: center;
+    min-width: 120px;
+  }
+  
+  @include small-mobile {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    min-width: 100px;
   }
 }
