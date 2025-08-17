@@ -95,7 +95,15 @@ const Carousel = () => {
   }, [projects, shuffledProjects.length, isFirstHomeVisit]);
 
   // Use shuffled projects for rendering
-  const displayProjects = shuffledProjects.length > 0 ? shuffledProjects : projects;
+  const baseProjects = shuffledProjects.length > 0 ? shuffledProjects : projects;
+  
+  // Create infinite scroll by duplicating projects array
+  // Structure: [projects, projects, projects] for seamless infinite scroll
+  const displayProjects = baseProjects.length > 0 ? [
+    ...baseProjects.map((project, index) => ({ ...project, id: `prev-${project.id}-${index}` })),
+    ...baseProjects.map((project, index) => ({ ...project, id: `current-${project.id}-${index}` })),
+    ...baseProjects.map((project, index) => ({ ...project, id: `next-${project.id}-${index}` }))
+  ] : [];
 
   // Pick a random card to center on first visit only
   const [rotation, setRotation] = useState(() => {
@@ -284,47 +292,78 @@ const Carousel = () => {
   // Mobile scroll initialization and hint animation
   useEffect(() => {
     const isMobile = window.innerWidth <= 768;
-    console.log('Mobile scroll useEffect running. isMobile:', isMobile, 'mobileScrollRef:', !!mobileScrollRef.current);
     
     if (isMobile && mobileScrollRef.current) {
       const scrollContainer = mobileScrollRef.current;
       let userHasScrolled = false;
       let isInitializing = true;
       
-      // Simple force to exact position
+      // IMMEDIATELY set initial position to avoid "whisking" effect
+      const cardWidth = window.innerWidth;
+      const totalCards = baseProjects.length;
+      const middleSectionStart = totalCards * cardWidth; // Start of middle section
+      
+      
+      // Only set position if we have valid data
+      if (totalCards > 0) {
+        // Temporarily disable scroll-snap for initial positioning
+        const originalScrollSnapType = scrollContainer.style.scrollSnapType;
+        scrollContainer.style.scrollSnapType = 'none';
+        
+        scrollContainer.scrollLeft = middleSectionStart;
+        
+        // Re-enable scroll-snap after a tiny delay
+        setTimeout(() => {
+          scrollContainer.style.scrollSnapType = originalScrollSnapType || 'x mandatory';
+        }, 50);
+      } else {
+      }
+      
+      // Enhanced force to exact position with device-specific handling
       const forceExactPosition = () => {
         const cardWidth = window.innerWidth;
         const currentScroll = scrollContainer.scrollLeft;
         const nearestCard = Math.round(currentScroll / cardWidth);
         const exactPosition = nearestCard * cardWidth;
         
-        scrollContainer.scrollLeft = exactPosition;
+        
+        // For real devices, sometimes we need to account for scroll-padding
+        if (Math.abs(currentScroll - exactPosition) > 1) {
+          scrollContainer.scrollLeft = exactPosition;
+          
+          // Additional check for real device padding issues
+          setTimeout(() => {
+            const finalScroll = scrollContainer.scrollLeft;
+            if (Math.abs(finalScroll - exactPosition) > 1) {
+              // Try alternative positioning that accounts for iOS Safari quirks
+              scrollContainer.scrollLeft = exactPosition;
+            }
+          }, 100);
+        }
       };
       
-      // Force initial positioning
+      // Clean up positioning after initial set - but don't move the scroll position again
       const initialTimer = setTimeout(() => {
         if (scrollContainer) {
-          console.log('Setting initial scroll position to 0');
-          scrollContainer.scrollLeft = 0;
+          
           // Force exact positioning after a moment
           setTimeout(() => {
-            console.log('Running initial forceExactPosition');
             forceExactPosition();
             // Initialization complete, now track user interactions
             setTimeout(() => {
               isInitializing = false;
-              console.log('Initialization complete, hint can now fire');
-            }, 200);
+            }, 500); // Longer delay to ensure everything is settled
           }, 100);
         }
       }, 300);
       
       // Listen for scroll events and track user interaction
       let isScrolling = false;
+      let scrollEndTimer = null;
+      
       const handleScrollStart = () => {
         isScrolling = true;
         userHasScrolled = true; // Mark that user has interacted
-        console.log('User started scrolling, hint disabled');
       };
       
       const handleScrollEnd = () => {
@@ -332,18 +371,77 @@ const Carousel = () => {
           setTimeout(() => {
             forceExactPosition();
             isScrolling = false;
+            
+            // Check for infinite scroll jump after scroll ends
+            checkAndPerformInfiniteJump();
           }, 100);
         }
       };
       
-      // Also detect any scroll movement, but ignore programmatic scrolls
+      // Separate function to handle infinite scroll jumps
+      const checkAndPerformInfiniteJump = () => {
+        const cardWidth = window.innerWidth;
+        const totalCards = baseProjects.length;
+        const currentScroll = scrollContainer.scrollLeft;
+        const currentCardIndex = Math.round(currentScroll / cardWidth);
+        
+        
+        // Only jump if we're actually at the problematic boundaries
+        // Be more conservative to avoid unnecessary jumps
+        if (currentCardIndex <= 1) {
+          // Jump from first card to equivalent position in middle section
+          const equivalentIndex = currentCardIndex + totalCards;
+          const targetScroll = equivalentIndex * cardWidth;
+          performSneakyJump(targetScroll, 'start to middle');
+        } else if (currentCardIndex >= (totalCards * 3) - 2) {
+          // Jump from last card to equivalent position in middle section
+          const equivalentIndex = currentCardIndex - totalCards;
+          const targetScroll = equivalentIndex * cardWidth;
+          performSneakyJump(targetScroll, 'end to middle');
+        } else {
+        }
+      };
+      
+      // Ultra-sneaky jump function
+      const performSneakyJump = (targetScroll, description) => {
+        
+        // Don't remove scroll listener - just set a flag to ignore scroll events temporarily
+        let isJumping = true;
+        
+        // Temporarily modify the scroll handler
+        const originalHandleScroll = handleScroll;
+        const tempHandleScroll = () => {
+          if (!isJumping) {
+            originalHandleScroll();
+          } else {
+          }
+        };
+        
+        // Replace the scroll handler temporarily
+        scrollContainer.removeEventListener('scroll', handleScroll);
+        scrollContainer.addEventListener('scroll', tempHandleScroll);
+        
+        // Set instant behavior and jump
+        const originalBehavior = scrollContainer.style.scrollBehavior;
+        scrollContainer.style.scrollBehavior = 'auto';
+        scrollContainer.scrollLeft = targetScroll;
+        
+        
+        // Restore everything after a tiny delay
+        setTimeout(() => {
+          isJumping = false;
+          scrollContainer.style.scrollBehavior = originalBehavior || 'smooth';
+          scrollContainer.removeEventListener('scroll', tempHandleScroll);
+          scrollContainer.addEventListener('scroll', handleScroll);
+        }, 50); // Slightly longer delay
+      };
+      
+      // Track scroll for infinite scroll behavior and user interaction
       const handleScroll = () => {
         // Only mark as user scrolled if we're not initializing
         if (!isInitializing) {
           userHasScrolled = true;
-          console.log('User scrolled, hint disabled');
         } else {
-          console.log('Ignoring scroll during initialization');
         }
       };
       
@@ -355,39 +453,62 @@ const Carousel = () => {
       
       // Scroll hint animation - show more of the next card
       if (displayProjects.length > 1) {
-        console.log('Setting up scroll hint timer for', displayProjects.length, 'projects');
         
         const hintTimer = setTimeout(() => {
-          console.log('Hint timer fired. ScrollContainer:', !!scrollContainer, 'ScrollLeft:', scrollContainer?.scrollLeft, 'UserHasScrolled:', userHasScrolled);
           
           if (scrollContainer && !userHasScrolled) {
-            // Temporarily disable scroll-snap for the hint animation
+            // Natural, smooth scroll hint animation
             const originalScrollSnapType = scrollContainer.style.scrollSnapType;
+            const originalBehavior = scrollContainer.style.scrollBehavior;
+            
+            // Temporarily disable scroll-snap but keep smooth behavior
             scrollContainer.style.scrollSnapType = 'none';
+            scrollContainer.style.scrollBehavior = 'smooth';
             
             const cardWidth = window.innerWidth;
             const hintDistance = cardWidth * 0.25; // Show 25% of next card
+            const currentPosition = scrollContainer.scrollLeft;
+            const targetHintPosition = currentPosition + hintDistance;
             
-            // Scroll to hint position
-            scrollContainer.scrollLeft = hintDistance;
             
+            // Smooth scroll to hint position FROM CURRENT POSITION
+            scrollContainer.scrollTo({
+              left: targetHintPosition,
+              behavior: 'smooth'
+            });
+            
+            // Wait longer to let user appreciate the peek
             setTimeout(() => {
-              // Return to start instantly
-              scrollContainer.scrollLeft = 0;
+              // Smooth scroll back to where we started
+              scrollContainer.scrollTo({
+                left: currentPosition,
+                behavior: 'smooth'
+              });
               
-              // Re-enable scroll-snap and force exact positioning
+              // Re-enable scroll-snap after the return animation completes
               setTimeout(() => {
                 scrollContainer.style.scrollSnapType = originalScrollSnapType || 'x mandatory';
+                scrollContainer.style.scrollBehavior = originalBehavior || 'smooth';
                 
-                // Force exact positioning after re-enabling scroll-snap
+                // Force exact positioning to fix edge spacing after hint
                 setTimeout(() => {
-                  const currentScroll = scrollContainer.scrollLeft;
-                  const nearestCard = Math.round(currentScroll / cardWidth);
-                  const exactPosition = nearestCard * cardWidth;
-                  scrollContainer.scrollLeft = exactPosition;
-                }, 50);
-              }, 50);
-            }, 800);
+                  forceExactPosition();
+                  
+                  // Double-check positioning after a moment
+                  setTimeout(() => {
+                    const currentScroll = scrollContainer.scrollLeft;
+                    const cardWidth = window.innerWidth;
+                    const nearestCard = Math.round(currentScroll / cardWidth);
+                    const exactPosition = nearestCard * cardWidth;
+                    
+                    
+                    if (Math.abs(currentScroll - exactPosition) > 5) {
+                      scrollContainer.scrollLeft = exactPosition;
+                    }
+                  }, 200);
+                }, 100);
+              }, 400); // Wait for smooth return to complete
+            }, 1500); // Longer pause to let user see the hint
           }
         }, 3000); // Slightly longer delay
         
@@ -411,7 +532,7 @@ const Carousel = () => {
         scrollContainer.removeEventListener('scroll', handleScroll);
       };
     }
-  }, [displayProjects.length]);
+  }, [displayProjects.length, baseProjects.length]);
 
   const getCardTransform = (index) => {
     // Check if mobile

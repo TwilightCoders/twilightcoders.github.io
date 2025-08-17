@@ -36,6 +36,14 @@ $z-carousel-active: 10;
 $z-navigation: 1000;
 $z-modal: 2000;
 
+// Border radius design system
+$radius-sm: 8px;     // Small elements (badges, small buttons)
+$radius-md: 12px;    // Medium elements (input fields, small cards)
+$radius-lg: 16px;    // Large elements (cards, modals)
+$radius-xl: 20px;    // Extra large elements (main cards, page cards)
+$radius-pill: 25px;  // Pill-shaped buttons and elements
+$radius-circle: 50%; // Circular elements
+
 // Breakpoints
 $mobile: 768px;
 $small-mobile: 480px;

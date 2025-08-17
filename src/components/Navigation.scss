@@ -45,7 +45,7 @@
   transition: all variables.$transition-fast ease;
   padding: 0.8rem 1.5rem;
   border: 2px solid rgba(variables.$accent-gold, 0.3);
-  border-radius: 25px;
+  border-radius: variables.$radius-pill;
   background: rgba(variables.$accent-gold, 0.1);
   display: inline-flex;
   align-items: center;

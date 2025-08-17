@@ -1,0 +1,146 @@
+@use '../styles/variables';
+@use '../styles/mixins';
+
+.newsletter-signup {
+  text-align: center;
+  
+  > p {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  @include mixins.mobile {
+    > p {
+      font-size: 0.9rem;
+      margin-bottom: 1.25rem;
+      line-height: 1.4;
+    }
+  }
+  
+  @include mixins.small-mobile {
+    > p {
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+    }
+  }
+}
+
+.newsletter-form {
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  
+  @include mixins.mobile {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
+.email-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 2px solid rgba(variables.$accent-gold, 0.3);
+  border-radius: variables.$radius-md;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 1rem;
+  transition: all variables.$transition-fast ease;
+  
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: rgba(variables.$accent-gold, 0.6);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 10px rgba(variables.$accent-gold, 0.3);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  @include mixins.mobile {
+    font-size: 16px; // Prevent zoom on iOS
+    padding: 0.75rem 1rem;
+    border-radius: variables.$radius-md;
+  }
+  
+  @include mixins.small-mobile {
+    font-size: 16px; // Prevent zoom on iOS
+    padding: 0.7rem 0.9rem;
+    border-radius: variables.$radius-md;
+  }
+}
+
+.submit-button {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid rgba(variables.$accent-gold, 0.3);
+  border-radius: variables.$radius-md;
+  background: rgba(variables.$accent-gold, 0.1);
+  color: variables.$accent-gold;
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all variables.$transition-fast ease;
+  white-space: nowrap;
+  
+  &:hover:not(:disabled) {
+    color: #fff;
+    background: rgba(variables.$accent-gold, 0.2);
+    border-color: rgba(variables.$accent-gold, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(variables.$accent-gold, 0.3);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  @include mixins.mobile {
+    width: 100%;
+    padding: 0.75rem 1rem;
+  }
+}
+
+.message {
+  padding: 0.75rem 1rem;
+  border-radius: variables.$radius-md;
+  font-size: 0.9rem;
+  font-weight: 500;
+  
+  &.success {
+    background: rgba(34, 197, 94, 0.2);
+    border: 1px solid rgba(34, 197, 94, 0.4);
+    color: rgb(34, 197, 94);
+  }
+  
+  &.error {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: rgb(239, 68, 68);
+  }
+}
+
+.privacy-note {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+  margin-top: 1rem;
+  
+  @include mixins.mobile {
+    margin-top: 0.5rem;
+  }
+}

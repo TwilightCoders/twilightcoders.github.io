@@ -20,7 +20,7 @@
 @mixin glass-effect($bg-color: rgba(40, 42, 58, 0.8), $blur: 5px) {
   background: $bg-color;
   backdrop-filter: blur($blur);
-  border-radius: 10px;
+  border-radius: variables.$radius-md;
 }
 
 // Card shadow

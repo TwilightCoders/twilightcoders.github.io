@@ -19,7 +19,6 @@ export const NavigationProvider = ({ children }) => {
     const newIndex = PAGE_ORDER[newPath] || 0;
     const calculatedDirection = newIndex - currentIndex;
     
-    console.log(`Navigating from ${previousPath.current} (${currentIndex}) to ${newPath} (${newIndex}), direction: ${calculatedDirection}`);
     
     setDirection(calculatedDirection);
     previousPath.current = newPath;

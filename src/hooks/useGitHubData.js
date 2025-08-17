@@ -25,7 +25,6 @@ export const useGitHubData = (limit = 6) => {
         
         // Try to use any cached data that might exist
         // If there's no cache, repositories will remain empty array
-        console.log('Attempting to use cached data if available...');
       } finally {
         setLoading(false);
       }

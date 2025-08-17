@@ -19,13 +19,22 @@ const Navigation = () => {
       const pageElement = document.querySelector(`.page-slide:nth-child(${pageIndex + 1})`);
       
       if (pageElement) {
+        // Update active section immediately when button is clicked
+        const event = new CustomEvent('pageChanged', { detail: { path } });
+        window.dispatchEvent(event);
+        
         pageElement.scrollIntoView({ 
           behavior: 'smooth',
           block: 'start'
         });
       }
     } else {
+      // Desktop navigation
       navigateToPage(path);
+      
+      // Also fire pageChanged event for consistent highlighting
+      const event = new CustomEvent('pageChanged', { detail: { path } });
+      window.dispatchEvent(event);
     }
   };
   

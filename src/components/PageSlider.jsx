@@ -6,6 +6,7 @@ import Navigation from './Navigation';
 import Carousel from './Carousel';
 import PageCard from './PageCard';
 import NewsletterModal from './NewsletterModal';
+import NewsletterSignup from './NewsletterSignup';
 import { Github, Mail } from 'lucide-react';
 
 const PAGE_ORDER = {
@@ -14,16 +15,18 @@ const PAGE_ORDER = {
   '/contact': 2
 };
 
-const PAGES = [
+const DESKTOP_PAGES = [
   {
     path: '/',
     title: 'Projects',
     isHomePage: true,
+    pageClass: 'home-page',
     content: <Carousel />
   },
   {
     path: '/about',
     title: 'About Us',
+    pageClass: 'about-page',
     content: (
       <>
         <p>
@@ -51,6 +54,7 @@ const PAGES = [
   {
     path: '/contact',
     title: 'Get In Touch',
+    pageClass: 'contact-page',
     content: (
       <>
         <p>
@@ -86,6 +90,18 @@ const PAGES = [
   }
 ];
 
+// Mobile gets an additional newsletter page
+const MOBILE_PAGES = [
+  ...DESKTOP_PAGES,
+  {
+    path: '/newsletter',
+    title: 'Stay Updated',
+    isNewsletterPage: true,
+    pageClass: 'newsletter-page',
+    content: <NewsletterSignup />
+  }
+];
+
 
 const PageSlider = () => {
   const location = useLocation();
@@ -101,12 +117,6 @@ const PageSlider = () => {
       const userAgent = navigator.userAgent;
       const isMobileUA = /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
       
-      console.log(`Mobile check: 
-        window.innerWidth=${window.innerWidth}
-        screen.width=${screen.width}
-        userAgent mobile=${isMobileUA}
-        final isMobile=${isMobileDevice}
-        userAgent=${userAgent}`);
       
       setIsMobile(isMobileDevice);
       
@@ -151,8 +161,8 @@ const PageSlider = () => {
       
       {isMobile ? (
         <ul className="page-slider">
-          {PAGES.map(({ path, title, content, isHomePage }, index) => (
-            <li key={path} className="page-slide">
+          {MOBILE_PAGES.map(({ path, title, content, isHomePage, isNewsletterPage, pageClass }, index) => (
+            <li key={path} className={`page-slide ${pageClass || ''}`}>
               {isHomePage ? (
                 <>
                   <div className="header-section">
@@ -163,6 +173,11 @@ const PageSlider = () => {
                     {content}
                   </div>
                 </>
+              ) : isNewsletterPage ? (
+                // Newsletter page now uses PageCard for consistent styling
+                <PageCard title={title}>
+                  {content}
+                </PageCard>
               ) : (
                 <PageCard title={title}>
                   {content}
@@ -181,8 +196,8 @@ const PageSlider = () => {
             ease: [0.4, 0.0, 0.2, 1]
           }}
         >
-          {PAGES.map(({ path, title, content, isHomePage }, index) => (
-            <li key={path} className="page-slide">
+          {DESKTOP_PAGES.map(({ path, title, content, isHomePage, pageClass }, index) => (
+            <li key={path} className={`page-slide ${pageClass || ''}`}>
               {isHomePage ? (
                 <div className="projects-section">
                   {content}
@@ -199,6 +214,11 @@ const PageSlider = () => {
       
       {/* Newsletter Modal */}
       <NewsletterModal />
+      
+      {/* Copyright Footer */}
+      <footer className="copyright-footer">
+        © 2025 Twilight Coders, LLC
+      </footer>
     </div>
   );
 };

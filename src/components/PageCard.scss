@@ -29,7 +29,7 @@
 .page-card-inner {
   width: 100%;
   background: linear-gradient(145deg, variables.$bg-card, variables.$bg-card-secondary);
-  border-radius: 20px;
+  border-radius: variables.$radius-xl;
   padding: 3rem;
   border: 1px solid rgba(variables.$accent-gold, 0.3);
   @include mixins.card-shadow;
@@ -45,18 +45,18 @@
     right: 0;
     height: 40%;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
-    border-radius: 20px 20px 0 0;
+    border-radius: variables.$radius-xl variables.$radius-xl 0 0;
     pointer-events: none;
   }
 
   @include mixins.mobile {
     padding: 1.5rem 1.2rem; // Reduced padding for more content space
-    border-radius: 15px;
+    border-radius: variables.$radius-lg;
   }
   
   @include mixins.small-mobile {
     padding: 1.5rem 1rem;
-    border-radius: 12px;
+    border-radius: variables.$radius-md;
   }
 }
 
