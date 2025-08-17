@@ -15,18 +15,23 @@ const PAGE_ORDER = {
   '/contact': 2
 };
 
-const DESKTOP_PAGES = [
+// Unified page configuration - works for both mobile and desktop
+const BASE_PAGES = [
   {
     path: '/',
     title: 'Projects',
     isHomePage: true,
     pageClass: 'home-page',
-    content: <Carousel />
+    content: <Carousel />,
+    showOnDesktop: true,
+    showOnMobile: true
   },
   {
     path: '/about',
     title: 'About Us',
     pageClass: 'about-page',
+    showOnDesktop: true,
+    showOnMobile: true,
     content: (
       <>
         <p>
@@ -55,6 +60,8 @@ const DESKTOP_PAGES = [
     path: '/contact',
     title: 'Get In Touch',
     pageClass: 'contact-page',
+    showOnDesktop: true,
+    showOnMobile: true,
     content: (
       <>
         <p>
@@ -87,21 +94,57 @@ const DESKTOP_PAGES = [
         </p>
       </>
     )
-  }
-];
-
-// Mobile gets an additional newsletter page
-const MOBILE_PAGES = [
-  ...DESKTOP_PAGES,
+  },
   {
     path: '/newsletter',
     title: 'Stay Updated',
     isNewsletterPage: true,
     pageClass: 'newsletter-page',
+    showOnDesktop: false,
+    showOnMobile: true,
     content: <NewsletterSignup />
   }
 ];
 
+// Helper functions for unified page system
+const getFilteredPages = (isMobile) => {
+  return BASE_PAGES.filter(page => isMobile ? page.showOnMobile : page.showOnDesktop);
+};
+
+const renderPageContent = (page, isMobile) => {
+  const { title, content, isHomePage, isNewsletterPage } = page;
+  
+  if (isHomePage) {
+    if (isMobile) {
+      // Mobile home page includes header
+      return (
+        <>
+          <div className="header-section">
+            <h1 className="logo" data-text="TWILIGHT CODERS">TWILIGHT CODERS</h1>
+            <p className="tagline">Dream. Code.</p>
+          </div>
+          <div className="projects-section">
+            {content}
+          </div>
+        </>
+      );
+    } else {
+      // Desktop home page shows only content
+      return (
+        <div className="projects-section">
+          {content}
+        </div>
+      );
+    }
+  } else {
+    // All other pages use PageCard
+    return (
+      <PageCard title={title}>
+        {content}
+      </PageCard>
+    );
+  }
+};
 
 const PageSlider = () => {
   const location = useLocation();
@@ -159,58 +202,32 @@ const PageSlider = () => {
         </div>
       )}
       
-      {isMobile ? (
-        <ul className="page-slider">
-          {MOBILE_PAGES.map(({ path, title, content, isHomePage, isNewsletterPage, pageClass }, index) => (
-            <li key={path} className={`page-slide ${pageClass || ''}`}>
-              {isHomePage ? (
-                <>
-                  <div className="header-section">
-                    <h1 className="logo" data-text="TWILIGHT CODERS">TWILIGHT CODERS</h1>
-                    <p className="tagline">Dream. Code.</p>
-                  </div>
-                  <div className="projects-section">
-                    {content}
-                  </div>
-                </>
-              ) : isNewsletterPage ? (
-                // Newsletter page now uses PageCard for consistent styling
-                <PageCard title={title}>
-                  {content}
-                </PageCard>
-              ) : (
-                <PageCard title={title}>
-                  {content}
-                </PageCard>
-              )}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <motion.ul
-          className="page-slider"
-          initial={getTransform()} // Set initial position immediately to prevent flash
-          animate={getTransform()}
-          transition={{
-            duration: 0.4 * Math.abs(direction || 1),
-            ease: [0.4, 0.0, 0.2, 1]
-          }}
-        >
-          {DESKTOP_PAGES.map(({ path, title, content, isHomePage, pageClass }, index) => (
-            <li key={path} className={`page-slide ${pageClass || ''}`}>
-              {isHomePage ? (
-                <div className="projects-section">
-                  {content}
-                </div>
-              ) : (
-                <PageCard title={title}>
-                  {content}
-                </PageCard>
-              )}
-            </li>
-          ))}
-        </motion.ul>
-      )}
+      {/* Unified page slider - configuration-based rendering */}
+      {(() => {
+        const pages = getFilteredPages(isMobile);
+        const SliderComponent = isMobile ? 'ul' : motion.ul;
+        const sliderProps = isMobile ? 
+          { className: "page-slider" } : 
+          {
+            className: "page-slider",
+            initial: getTransform(),
+            animate: getTransform(),
+            transition: {
+              duration: 0.4 * Math.abs(direction || 1),
+              ease: [0.4, 0.0, 0.2, 1]
+            }
+          };
+
+        return (
+          <SliderComponent {...sliderProps}>
+            {pages.map((page, index) => (
+              <li key={page.path} className={`page-slide ${page.pageClass || ''}`}>
+                {renderPageContent(page, isMobile)}
+              </li>
+            ))}
+          </SliderComponent>
+        );
+      })()}
       
       {/* Newsletter Modal */}
       <NewsletterModal />
