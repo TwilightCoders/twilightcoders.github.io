@@ -23,8 +23,9 @@ export const useGitHubData = (limit = 6) => {
         console.error('Error loading GitHub repositories:', err);
         setError(err.message);
         
-        // Fallback to placeholder data on error
-        setRepositories([]);
+        // Try to use any cached data that might exist
+        // If there's no cache, repositories will remain empty array
+        console.log('Attempting to use cached data if available...');
       } finally {
         setLoading(false);
       }

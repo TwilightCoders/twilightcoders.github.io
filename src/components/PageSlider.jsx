@@ -5,7 +5,8 @@ import { useNavigation } from '../contexts/NavigationContext';
 import Navigation from './Navigation';
 import Carousel from './Carousel';
 import PageCard from './PageCard';
-import NewsletterSignup from './NewsletterSignup';
+import NewsletterModal from './NewsletterModal';
+import { Github, Mail } from 'lucide-react';
 
 const PAGE_ORDER = {
   '/': 0,
@@ -57,12 +58,13 @@ const PAGES = [
           a development opportunity? We'd love to hear from you.
         </p>
         
-        <h3>Connect With Us</h3>
         <div className="contact-links">
           <a href="https://github.com/TwilightCoders" className="contact-link" target="_blank" rel="noopener noreferrer">
+            <Github size={16} />
             GitHub
           </a>
           <a href="mailto:hello@twilightcoders.dev" className="contact-link">
+            <Mail size={16} />
             Email
           </a>
         </div>
@@ -74,8 +76,6 @@ const PAGES = [
           <li>Opportunities to share knowledge and learn from others</li>
           <li>Creative partnerships that push the boundaries of development</li>
         </ul>
-        
-        <NewsletterSignup />
         
         <p>
           Whether you're looking to contribute to our projects, need technical expertise, 
@@ -97,7 +97,27 @@ const PageSlider = () => {
   // Detect mobile viewport
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
+      const isMobileDevice = window.innerWidth <= 768;
+      const userAgent = navigator.userAgent;
+      const isMobileUA = /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+      
+      console.log(`Mobile check: 
+        window.innerWidth=${window.innerWidth}
+        screen.width=${screen.width}
+        userAgent mobile=${isMobileUA}
+        final isMobile=${isMobileDevice}
+        userAgent=${userAgent}`);
+      
+      setIsMobile(isMobileDevice);
+      
+      // Add/remove mobile class on body for CSS targeting
+      if (isMobileDevice) {
+        document.body.classList.add('mobile-device');
+        document.body.classList.remove('desktop-device');
+      } else {
+        document.body.classList.add('desktop-device');
+        document.body.classList.remove('mobile-device');
+      }
     };
     
     checkMobile();
@@ -121,19 +141,28 @@ const PageSlider = () => {
       <div className="navigation-mobile">
         <Navigation />
       </div>
-      <div className="header-section">
-        <h1 className="logo" data-text="TWILIGHT CODERS">TWILIGHT CODERS</h1>
-        <p className="tagline">Dream. Code.</p>
-      </div>
+      {/* Header section - only show on desktop */}
+      {!isMobile && (
+        <div className="header-section">
+          <h1 className="logo" data-text="TWILIGHT CODERS">TWILIGHT CODERS</h1>
+          <p className="tagline">Dream. Code.</p>
+        </div>
+      )}
       
       {isMobile ? (
         <ul className="page-slider">
           {PAGES.map(({ path, title, content, isHomePage }, index) => (
             <li key={path} className="page-slide">
               {isHomePage ? (
-                <div className="projects-section">
-                  {content}
-                </div>
+                <>
+                  <div className="header-section">
+                    <h1 className="logo" data-text="TWILIGHT CODERS">TWILIGHT CODERS</h1>
+                    <p className="tagline">Dream. Code.</p>
+                  </div>
+                  <div className="projects-section">
+                    {content}
+                  </div>
+                </>
               ) : (
                 <PageCard title={title}>
                   {content}
@@ -167,6 +196,9 @@ const PageSlider = () => {
           ))}
         </motion.ul>
       )}
+      
+      {/* Newsletter Modal */}
+      <NewsletterModal />
     </div>
   );
 };

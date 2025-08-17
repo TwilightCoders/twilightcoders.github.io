@@ -1,19 +1,19 @@
 @use 'sass:math';
-@import '../styles/variables';
-@import '../styles/mixins';
+@use '../styles/variables';
+@use '../styles/mixins';
 
 .carousel-container {
   position: relative;
   width: 100%;
-  height: $carousel-height;
+  height: variables.$carousel-height;
   overflow: visible;
   display: flex;
   justify-content: center;
   align-items: center;
   perspective: 1000px;
 
-  @include mobile {
-    height: $mobile-carousel-height;
+  @include mixins.mobile {
+    height: variables.$mobile-carousel-height;
     padding: 0;
     margin-top: -5vh;
     overflow: visible; // Show cards properly on mobile
@@ -24,14 +24,14 @@
   position: relative;
   width: 900px;
   height: 100%;
-  transition: transform $transition-slow $transition-smooth;
+  transition: transform variables.$transition-slow variables.$transition-smooth;
   cursor: default;
   transform-style: preserve-3d;
   display: flex;
   align-items: center;
-  @include no-select;
+  @include mixins.no-select;
 
-  @include mobile {
+  @include mixins.mobile {
     width: 100vw;
     transform-style: flat; // Use flat transforms on mobile for simpler layout
   }
@@ -49,26 +49,26 @@
 
 .project-card {
   position: absolute;
-  width: $card-width;
-  height: $card-height;
-  background: linear-gradient(145deg, $bg-card, $bg-card-secondary);
+  width: variables.$card-width;
+  height: variables.$card-height;
+  background: linear-gradient(145deg, variables.$bg-card, variables.$bg-card-secondary);
   border-radius: 15px;
   padding: 2rem 1.5rem;
-  border: 1px solid rgba($accent-gold, 0.3);
-  @include card-shadow;
-  transition: transform $transition-carousel $transition-smooth, 
-              opacity $transition-fast ease, 
-              filter $transition-fast ease;
+  border: 1px solid rgba(variables.$accent-gold, 0.3);
+  @include mixins.card-shadow;
+  transition: transform variables.$transition-carousel variables.$transition-smooth, 
+              opacity variables.$transition-fast ease, 
+              filter variables.$transition-fast ease;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   text-align: center;
   left: 50%;
   top: 50%;
-  margin-left: -#{math.div($card-width, 2)};
-  margin-top: -#{math.div($card-height, 2)};
+  margin-left: -#{math.div(variables.$card-width, 2)};
+  margin-top: -#{math.div(variables.$card-height, 2)};
   cursor: grab;
-  @include no-select;
+  @include mixins.no-select;
 
   &:active {
     cursor: grabbing;
@@ -91,7 +91,7 @@
   }
 
   &.active {
-    z-index: $z-carousel-active;
+    z-index: variables.$z-carousel-active;
     filter: brightness(1.1);
   }
 
@@ -113,9 +113,9 @@
   }
 
   &.dealing {
-    transition: transform $transition-dealing-time $transition-dealing, 
-                opacity $transition-fast ease, 
-                filter $transition-fast ease;
+    transition: transform variables.$transition-dealing-time variables.$transition-dealing, 
+                opacity variables.$transition-fast ease, 
+                filter variables.$transition-fast ease;
   }
 
   .card-top-row {
@@ -152,7 +152,7 @@
     margin-bottom: 1rem;
     
     h3 {
-      color: $accent-gold;
+      color: variables.$accent-gold;
       margin-bottom: 0.5rem;
       font-size: 1.4rem;
       font-weight: bold;
@@ -195,11 +195,11 @@
     align-items: center;
   }
 
-  @include mobile {
-    width: $mobile-card-width;
-    height: $mobile-card-height;
-    margin-left: -#{math.div($mobile-card-width, 2)};
-    margin-top: -#{math.div($mobile-card-height, 2)};
+  @include mixins.mobile {
+    width: variables.$mobile-card-width;
+    height: variables.$mobile-card-height;
+    margin-left: -#{math.div(variables.$mobile-card-width, 2)};
+    margin-top: -#{math.div(variables.$mobile-card-height, 2)};
     padding: 1.5rem 1rem;
     
     .project-header h3 {
@@ -222,11 +222,185 @@
     }
   }
   
-  @include small-mobile {
+  @include mixins.small-mobile {
     width: 85vw;
     max-width: 300px;
     height: 360px;
     padding: 1.5rem 1rem;
+  }
+}
+
+// Mobile horizontal scroll layout
+.mobile-carousel-scroll {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  gap: 0; // No gap between cards
+  padding: 0; // No container padding
+  scrollbar-width: none; // Firefox
+  -ms-overflow-style: none; // IE/Edge
+  height: 100%; // Fill available space
+  align-items: center; // Center cards vertically
+  
+  // Force exact pixel alignment with horizontal padding
+  scroll-padding: 0 1.5rem; // Match card edge padding for proper snap positioning
+  scroll-snap-stop: always;
+  
+  &::-webkit-scrollbar {
+    display: none; // Chrome/Safari
+  }
+  
+  @include mixins.mobile {
+    width: 100vw; // Exact viewport width
+    max-width: 100vw;
+    padding: 0;
+    gap: 0;
+    height: 100%; // Fill available space
+  }
+}
+
+.mobile-project-card {
+  flex: 0 0 100vw; // Full viewport width, no grow/shrink
+  scroll-snap-align: center; // Back to center alignment
+  padding: 0 1.5rem; // Add back edge padding for mobile
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  box-sizing: border-box;
+  
+  @include mixins.mobile {
+    padding: 0 1.5rem; // Edge padding for mobile
+    min-height: 50vh;
+  }
+  
+  @include mixins.small-mobile {
+    padding: 0 0.5rem; // Edge padding for small mobile
+    min-height: 45vh;
+  }
+}
+
+.mobile-project-card-inner {
+  width: 100%; // Full width of the padded container
+  max-width: 800px;
+  background: linear-gradient(145deg, variables.$bg-card, variables.$bg-card-secondary);
+  border-radius: 20px;
+  padding: 3rem;
+  border: 1px solid rgba(variables.$accent-gold, 0.3);
+  @include mixins.card-shadow;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: center;
+  box-sizing: border-box;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+    border-radius: 20px 20px 0 0; // Match the border radius
+    pointer-events: none;
+  }
+
+  .card-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.8rem;
+    position: relative;
+    z-index: 10;
+    margin-top: -0.5rem;
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+  }
+
+  .stars-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.8rem;
+    color: #fff;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.3));
+    padding: 0.3rem 0.6rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.2);
+  }
+
+  .language-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: #fff;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+    padding: 0.3rem 0.6rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    font-weight: 500;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+    .language-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      filter: saturate(1.6) brightness(1.3);
+      box-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
+    }
+  }
+
+  .project-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1rem;
+    
+    h3 {
+      color: variables.$accent-gold;
+      margin-bottom: 0.5rem;
+      font-size: 1.3rem;
+      font-weight: bold;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+      text-align: center;
+    }
+  }
+
+  p {
+    opacity: 0.9;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    flex-grow: 1;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    font-size: 0.95rem;
+  }
+
+  .project-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  @include mixins.mobile {
+    width: calc(100vw - 3rem); // Full viewport width minus total margin
+    padding: 1.5rem 1.2rem;
+    border-radius: 20px; // Keep consistent with default
+  }
+  
+  @include mixins.small-mobile {
+    width: calc(100vw - 1rem); // Full viewport width minus total margin
+    padding: 1.5rem 1rem;
+    border-radius: 20px; // Keep consistent with default
   }
 }
 
@@ -237,7 +411,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: $carousel-height;
+  height: variables.$carousel-height;
   color: #fff;
   text-align: center;
 
@@ -247,16 +421,16 @@
     opacity: 0.8;
   }
 
-  @include mobile {
-    height: $mobile-carousel-height;
+  @include mixins.mobile {
+    height: variables.$mobile-carousel-height;
   }
 }
 
 .loading-spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid rgba($accent-gold, 0.3);
-  border-top: 3px solid $accent-gold;
+  border: 3px solid rgba(variables.$accent-gold, 0.3);
+  border-top: 3px solid variables.$accent-gold;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -267,14 +441,14 @@
 }
 
 .project-link {
-  color: $accent-gold;
+  color: variables.$accent-gold;
   text-decoration: none;
   font-weight: bold;
-  transition: all $transition-fast ease;
+  transition: all variables.$transition-fast ease;
   padding: 0.8rem 1.5rem;
-  border: 2px solid rgba($accent-gold, 0.3);
+  border: 2px solid rgba(variables.$accent-gold, 0.3);
   border-radius: 25px;
-  background: rgba($accent-gold, 0.1);
+  background: rgba(variables.$accent-gold, 0.1);
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
@@ -291,10 +465,10 @@
 
   &:hover {
     color: #fff;
-    background: rgba($accent-gold, 0.2);
-    border-color: rgba($accent-gold, 0.6);
+    background: rgba(variables.$accent-gold, 0.2);
+    border-color: rgba(variables.$accent-gold, 0.6);
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba($accent-gold, 0.3);
+    box-shadow: 0 4px 15px rgba(variables.$accent-gold, 0.3);
   }
 }
 
@@ -308,41 +482,49 @@
   gap: 2rem;
   justify-content: center;
   flex-wrap: wrap;
+  width: 100%;
+  margin: 1.5rem 0;
 
-  @include mobile {
+  @include mixins.mobile {
     gap: 1rem;
-    flex-direction: column;
+    flex-direction: row; // Keep side-by-side on mobile
     align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin: 1rem 0;
   }
   
-  @include small-mobile {
+  @include mixins.small-mobile {
     gap: 0.8rem;
   }
 }
 
 .contact-link {
-  color: $accent-gold;
+  color: variables.$accent-gold;
   text-decoration: none;
   font-size: 1.1rem;
-  transition: color $transition-fast ease;
+  transition: color variables.$transition-fast ease;
   padding: 0.5rem 1rem;
-  border: 1px solid rgba($accent-gold, 0.3);
+  border: 1px solid rgba(variables.$accent-gold, 0.3);
   border-radius: 25px;
   background: rgba(255, 255, 255, 0.05);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
 
   &:hover {
     color: #fff;
-    background: rgba($accent-gold, 0.1);
+    background: rgba(variables.$accent-gold, 0.1);
   }
   
-  @include mobile {
+  @include mixins.mobile {
     font-size: 1rem;
     padding: 0.6rem 1.2rem;
     text-align: center;
     min-width: 120px;
   }
   
-  @include small-mobile {
+  @include mixins.small-mobile {
     font-size: 0.9rem;
     padding: 0.5rem 1rem;
     min-width: 100px;

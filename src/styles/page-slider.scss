@@ -1,5 +1,5 @@
-@import 'variables';
-@import 'mixins';
+@use 'variables';
+@use 'mixins';
 
 .page-slider {
   display: flex;
@@ -9,11 +9,12 @@
   margin: 0;
   padding: 0;
   
-  @include mobile {
+  @include mixins.mobile {
     flex-direction: column; // Stack pages vertically on mobile
     width: 100vw; // Full width
     height: 300vh; // 3 pages stacked vertically
     touch-action: pan-y; // Enable vertical scrolling on mobile
+    padding-top: 3rem !important; // Force account for fixed navigation
   }
 }
 
@@ -31,15 +32,35 @@
   // Better clipping during transitions
   clip-path: inset(0 0 0 0);
   
-  @include mobile {
+  @include mixins.mobile {
     width: 100vw; // Each page takes full width
     height: 100vh; // Each page takes full height
-    padding-top: 2rem; // Add some padding back for readability
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding-top: 3.5rem; // Account for fixed navigation height
+    padding-left: 0; // No side padding - let page card handle it
+    padding-right: 0;
+    padding-bottom: 1rem; // Reduced bottom padding
+    scroll-snap-align: start; // Snap to each page section
+    scroll-snap-stop: always; // Force stopping at each snap point
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; // Align to top instead of center
+    align-items: center;
+    
+    // Style the header inside the first page
+    .header-section {
+      margin-bottom: 0; // No space between tagline and cards
+      margin-top: 0; // No space between navigation and title
+      padding: 0.25rem;
+      text-align: center;
+    }
+    
+    .projects-section {
+      margin-top: 0; // Remove gap between header and projects
+      flex: 1; // Take remaining space
+    }
   }
   
-  @include small-mobile {
+  @include mixins.small-mobile {
     padding-top: 1.5rem;
     padding-left: 0.5rem;
     padding-right: 0.5rem;

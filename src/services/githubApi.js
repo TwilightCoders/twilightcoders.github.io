@@ -145,11 +145,33 @@ const getPinnedRepositories = async () => {
   return [...new Set([...manualPinned, ...homepagePinned])];
 };
 
-// Simple cache to avoid hitting rate limits
-const repositoryCache = {
-  data: null,
-  timestamp: null,
-  duration: 5 * 60 * 1000 // 5 minutes
+// Persistent cache using localStorage to avoid hitting rate limits
+const CACHE_KEY = 'twilight_coders_repos';
+const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
+
+const getCache = () => {
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const { data, timestamp } = JSON.parse(cached);
+      return { data, timestamp };
+    }
+  } catch (error) {
+    console.warn('Error reading cache:', error);
+  }
+  return { data: null, timestamp: null };
+};
+
+const setCache = (data) => {
+  try {
+    const cacheData = {
+      data,
+      timestamp: Date.now()
+    };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+  } catch (error) {
+    console.warn('Error setting cache:', error);
+  }
 };
 
 /**
@@ -158,11 +180,12 @@ const repositoryCache = {
  * @returns {Promise<Array>} Array of repository objects
  */
 export const fetchRepositories = async (limit = 6) => {
-  // Check cache first
-  if (repositoryCache.data && repositoryCache.timestamp && 
-      Date.now() - repositoryCache.timestamp < repositoryCache.duration) {
-    console.log('Using cached repository data');
-    return repositoryCache.data.slice(0, limit);
+  // Check persistent cache first
+  const { data: cachedData, timestamp: cachedTimestamp } = getCache();
+  if (cachedData && cachedTimestamp && 
+      Date.now() - cachedTimestamp < CACHE_DURATION) {
+    console.log('Using cached repository data from localStorage');
+    return cachedData.slice(0, limit);
   }
   try {
     // Fetch a larger set to ensure we have enough after filtering and sorting
@@ -239,13 +262,20 @@ export const fetchRepositories = async (limit = 6) => {
       })
     );
     
-    // Cache the results
-    repositoryCache.data = reposWithTitles;
-    repositoryCache.timestamp = Date.now();
+    // Cache the results persistently
+    setCache(reposWithTitles);
     
     return reposWithTitles;
   } catch (error) {
     console.error('Error fetching repositories:', error);
+    
+    // If we have cached data (even stale), return it instead of throwing
+    const { data: cachedData } = getCache();
+    if (cachedData) {
+      console.log('API failed, returning cached repository data (possibly stale)');
+      return cachedData.slice(0, limit);
+    }
+    
     throw error;
   }
 };

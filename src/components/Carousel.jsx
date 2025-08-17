@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigation } from '../contexts/NavigationContext';
 import { useGitHubData } from '../hooks/useGitHubData';
 import { getLanguageColor } from '../services/githubApi';
+import { Github, ExternalLink } from 'lucide-react';
 import './Carousel.scss';
 
 // Placeholder project data - we'll replace this with GitHub API data later
@@ -53,6 +54,7 @@ const PLACEHOLDER_PROJECTS = [
 const Carousel = () => {
   const { repositories: projects, loading, error } = useGitHubData(6);
   const { isFirstHomeVisit } = useNavigation();
+  const mobileScrollRef = useRef(null);
   
   // Generate random rotations and positions for each card in the stack (only on first visit)
   // CRITICAL: These transforms must be completely stable and never change after initialization
@@ -152,8 +154,6 @@ const Carousel = () => {
   };
 
   const handleStart = (e) => {
-    // Disable drag on mobile
-    if (window.innerWidth <= 768) return;
     if (isAnimating) return;
     
     // Prevent default behavior to avoid text selection
@@ -168,8 +168,6 @@ const Carousel = () => {
   };
 
   const handleMove = (e) => {
-    // Disable drag on mobile
-    if (window.innerWidth <= 768) return;
     // Only process if we actually started a drag on a card
     if (startX.current === 0) return;
     
@@ -195,8 +193,6 @@ const Carousel = () => {
   };
 
   const handleEnd = (e) => {
-    // Disable drag on mobile
-    if (window.innerWidth <= 768) return;
     // Only process if we actually started a drag on a card
     if (startX.current === 0) return;
     
@@ -231,8 +227,8 @@ const Carousel = () => {
   };
 
   const handleCardClick = (e, index) => {
-    // On mobile, disable card click navigation (let links work normally)
-    if (window.innerWidth <= 768) {
+    // If user dragged, don't handle click
+    if (hasDragged) {
       return;
     }
     
@@ -284,6 +280,138 @@ const Carousel = () => {
       document.removeEventListener('touchend', handleGlobalEnd);
     };
   }, [isDragging, rotation]);
+
+  // Mobile scroll initialization and hint animation
+  useEffect(() => {
+    const isMobile = window.innerWidth <= 768;
+    console.log('Mobile scroll useEffect running. isMobile:', isMobile, 'mobileScrollRef:', !!mobileScrollRef.current);
+    
+    if (isMobile && mobileScrollRef.current) {
+      const scrollContainer = mobileScrollRef.current;
+      let userHasScrolled = false;
+      let isInitializing = true;
+      
+      // Simple force to exact position
+      const forceExactPosition = () => {
+        const cardWidth = window.innerWidth;
+        const currentScroll = scrollContainer.scrollLeft;
+        const nearestCard = Math.round(currentScroll / cardWidth);
+        const exactPosition = nearestCard * cardWidth;
+        
+        scrollContainer.scrollLeft = exactPosition;
+      };
+      
+      // Force initial positioning
+      const initialTimer = setTimeout(() => {
+        if (scrollContainer) {
+          console.log('Setting initial scroll position to 0');
+          scrollContainer.scrollLeft = 0;
+          // Force exact positioning after a moment
+          setTimeout(() => {
+            console.log('Running initial forceExactPosition');
+            forceExactPosition();
+            // Initialization complete, now track user interactions
+            setTimeout(() => {
+              isInitializing = false;
+              console.log('Initialization complete, hint can now fire');
+            }, 200);
+          }, 100);
+        }
+      }, 300);
+      
+      // Listen for scroll events and track user interaction
+      let isScrolling = false;
+      const handleScrollStart = () => {
+        isScrolling = true;
+        userHasScrolled = true; // Mark that user has interacted
+        console.log('User started scrolling, hint disabled');
+      };
+      
+      const handleScrollEnd = () => {
+        if (isScrolling) {
+          setTimeout(() => {
+            forceExactPosition();
+            isScrolling = false;
+          }, 100);
+        }
+      };
+      
+      // Also detect any scroll movement, but ignore programmatic scrolls
+      const handleScroll = () => {
+        // Only mark as user scrolled if we're not initializing
+        if (!isInitializing) {
+          userHasScrolled = true;
+          console.log('User scrolled, hint disabled');
+        } else {
+          console.log('Ignoring scroll during initialization');
+        }
+      };
+      
+      scrollContainer.addEventListener('touchstart', handleScrollStart);
+      scrollContainer.addEventListener('touchend', handleScrollEnd);
+      scrollContainer.addEventListener('mousedown', handleScrollStart);
+      scrollContainer.addEventListener('mouseup', handleScrollEnd);
+      scrollContainer.addEventListener('scroll', handleScroll);
+      
+      // Scroll hint animation - show more of the next card
+      if (displayProjects.length > 1) {
+        console.log('Setting up scroll hint timer for', displayProjects.length, 'projects');
+        
+        const hintTimer = setTimeout(() => {
+          console.log('Hint timer fired. ScrollContainer:', !!scrollContainer, 'ScrollLeft:', scrollContainer?.scrollLeft, 'UserHasScrolled:', userHasScrolled);
+          
+          if (scrollContainer && !userHasScrolled) {
+            // Temporarily disable scroll-snap for the hint animation
+            const originalScrollSnapType = scrollContainer.style.scrollSnapType;
+            scrollContainer.style.scrollSnapType = 'none';
+            
+            const cardWidth = window.innerWidth;
+            const hintDistance = cardWidth * 0.25; // Show 25% of next card
+            
+            // Scroll to hint position
+            scrollContainer.scrollLeft = hintDistance;
+            
+            setTimeout(() => {
+              // Return to start instantly
+              scrollContainer.scrollLeft = 0;
+              
+              // Re-enable scroll-snap and force exact positioning
+              setTimeout(() => {
+                scrollContainer.style.scrollSnapType = originalScrollSnapType || 'x mandatory';
+                
+                // Force exact positioning after re-enabling scroll-snap
+                setTimeout(() => {
+                  const currentScroll = scrollContainer.scrollLeft;
+                  const nearestCard = Math.round(currentScroll / cardWidth);
+                  const exactPosition = nearestCard * cardWidth;
+                  scrollContainer.scrollLeft = exactPosition;
+                }, 50);
+              }, 50);
+            }, 800);
+          }
+        }, 3000); // Slightly longer delay
+        
+        return () => {
+          clearTimeout(initialTimer);
+          clearTimeout(hintTimer);
+          scrollContainer.removeEventListener('touchstart', handleScrollStart);
+          scrollContainer.removeEventListener('touchend', handleScrollEnd);
+          scrollContainer.removeEventListener('mousedown', handleScrollStart);
+          scrollContainer.removeEventListener('mouseup', handleScrollEnd);
+          scrollContainer.removeEventListener('scroll', handleScroll);
+        };
+      }
+      
+      return () => {
+        clearTimeout(initialTimer);
+        scrollContainer.removeEventListener('touchstart', handleScrollStart);
+        scrollContainer.removeEventListener('touchend', handleScrollEnd);
+        scrollContainer.removeEventListener('mousedown', handleScrollStart);
+        scrollContainer.removeEventListener('mouseup', handleScrollEnd);
+        scrollContainer.removeEventListener('scroll', handleScroll);
+      };
+    }
+  }, [displayProjects.length]);
 
   const getCardTransform = (index) => {
     // Check if mobile
@@ -399,78 +527,136 @@ const Carousel = () => {
     );
   }
 
+  // Check if mobile for rendering logic
+  const isMobile = window.innerWidth <= 768;
+
   return (
     <div className={`carousel-container ${isDragging ? 'dragging' : ''}`}>
-      <div className="carousel" ref={carouselRef}>
-        {displayProjects.map((project, index) => {
-          const cardStyle = getCardTransform(index);
-          const cardClassName = getCardClassName(index);
-          
-          return (
+      {isMobile ? (
+        // Mobile: Horizontal snap scroll layout
+        <div className="mobile-carousel-scroll" ref={mobileScrollRef}>
+          {displayProjects.map((project) => (
             <div
               key={project.id}
-              className={cardClassName}
-              style={cardStyle}
-              onMouseDown={handleStart}
-              onTouchStart={handleStart}
-              onDragStart={(e) => e.preventDefault()}
-              onClick={(e) => handleCardClick(e, index)}
+              className="mobile-project-card"
             >
-              <div className="reflection"></div>
-              <div className="card-top-row">
-                {project.language && (
-                  <div 
-                    className="language-badge"
-                    style={{ borderColor: getLanguageColor(project.language) }}
-                  >
-                    <span 
-                      className="language-dot" 
-                      style={{ backgroundColor: getLanguageColor(project.language) }}
-                    ></span>
-                    {project.language}
-                  </div>
-                )}
-                {project.stars !== undefined && (
-                  <div className="stars-badge">
-                    <span>⭐</span>
-                    <span>{project.stars}</span>
-                  </div>
-                )}
-              </div>
-              <div className="project-header">
-                <h3>{project.displayName || project.name}</h3>
-              </div>
-              <p>{project.displayDescription}</p>
-              <div className="project-footer">
-                <a 
-                  href={project.url} 
-                  className="project-link"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {project.homepage ? (
-                    <>
-                      <svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" className="external-icon">
-                        <path d="M283.276,454.904c-4.739,3.858-9.502,6.888-14.295,9.177c-3.256,0.348-6.533,0.603-9.827,0.796v-38.201c-7.878-6.448-15.802-13.144-23.751-20.024v58.232c-3.293-0.2-6.571-0.456-9.818-0.804c-4.794-2.289-9.564-5.32-14.303-9.177c-15.447-12.572-29.905-33.794-40.992-61.108h50.486c-8.605-7.693-17.218-15.618-25.83-23.75h-32.959c-3.936-13.09-7.104-27.207-9.517-42.013c-9.378-9.703-18.486-19.429-27.331-29.139c1.987,25.281,6.061,49.264,12.13,71.152H76.602c-16.986-27.454-27.516-59.276-29.511-93.464h58.24c-6.881-7.948-13.577-15.873-20.017-23.751H47.092c0.819-14.009,3.147-27.586,6.68-40.66c-8.064-11.001-15.626-21.84-22.599-32.456c-10.368,26.333-16.127,54.986-16.127,84.999c0.007,128.262,103.963,232.21,232.226,232.218c30.005,0,58.658-5.759,84.982-16.119c-14.14-9.301-28.691-19.638-43.488-30.84C286.948,451.726,285.124,453.397,283.276,454.904z M105.456,406.53c-4.067-4.067-7.933-8.335-11.636-12.734h51.158c3.811,10.391,8.002,20.287,12.694,29.379c5.528,10.685,11.652,20.403,18.339,29.016C149.307,442.039,125.325,426.384,105.456,406.53z"/>
-                        <path d="M78.442,105.348c5.072,9.084,10.839,18.548,17.187,28.296c3.17-3.68,6.386-7.314,9.826-10.754c19.908-19.893,43.945-35.58,70.71-45.731c-12.44,15.973-22.9,35.788-31.226,58.457H96.89c5.086,7.746,10.568,15.679,16.374,23.75h24.068c-2.188,7.878-4.067,16.074-5.76,24.454c6.363,8.18,13.02,16.452,19.947,24.787c2.498-17.458,6.007-34.042,10.585-49.242h73.3v93.464h-45.12c7.338,7.94,14.852,15.865,22.545,23.751h22.575v22.576c7.886,7.685,15.811,15.215,23.751,22.544v-45.12h87.751c-0.974,34.095-6.146,65.918-14.442,93.464h-17.388c11.412,9.192,22.676,17.844,33.694,25.876c0.271-0.727,0.587-1.392,0.858-2.126h51.112c-3.711,4.399-7.569,8.667-11.636,12.734c-3.433,3.432-7.036,6.695-10.716,9.864c9.734,6.34,19.181,12.092,28.243,17.164c44.849-42.336,72.883-102.301,72.883-168.844C479.505,136.451,375.542,32.488,247.272,32.48C180.728,32.488,120.779,60.514,78.442,105.348z M417.956,370.046h-60.73c7.84-28.259,12.587-59.88,13.507-93.464h76.734C445.472,310.77,434.942,342.591,417.956,370.046z M417.94,159.366c16.994,27.454,27.524,59.284,29.526,93.464h-76.811c-0.928-33.554-5.535-65.222-13.375-93.464H417.94z M389.094,122.89c4.067,4.067,7.925,8.327,11.628,12.726H349.58c-3.811-10.383-8.01-20.279-12.695-29.371c-5.528-10.677-11.651-20.395-18.331-29.016C345.25,87.38,369.226,103.044,389.094,122.89z M259.154,64.534c3.301,0.201,6.58,0.456,9.834,0.804c4.794,2.281,9.548,5.312,14.288,9.169c15.447,12.564,29.897,33.794,40.984,61.108h-65.106V64.534z M259.154,159.366h73.409c8.296,27.539,13.437,59.4,14.419,93.464h-87.828V159.366z M211.282,74.507c4.739-3.858,9.494-6.888,14.288-9.177c3.254-0.348,6.533-0.603,9.833-0.804v71.09h-64.982c2.621-6.472,5.374-12.718,8.35-18.47C188.312,98.652,199.538,84.102,211.282,74.507z"/>
-                      </svg>
-                      Visit Site
-                    </>
-                  ) : (
-                    <>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="github-icon">
-                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                      </svg>
-                      View Code
-                    </>
+              <div className="mobile-project-card-inner">
+                <div className="card-top-row">
+                  {project.language && (
+                    <div 
+                      className="language-badge"
+                      style={{ borderColor: getLanguageColor(project.language) }}
+                    >
+                      <span 
+                        className="language-dot" 
+                        style={{ backgroundColor: getLanguageColor(project.language) }}
+                      ></span>
+                      {project.language}
+                    </div>
                   )}
-                </a>
+                  {project.stars !== undefined && (
+                    <div className="stars-badge">
+                      <span>⭐</span>
+                      <span>{project.stars}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="project-header">
+                  <h3>{project.displayName || project.name}</h3>
+                </div>
+                <p>{project.displayDescription}</p>
+                <div className="project-footer">
+                  <a 
+                    href={project.url} 
+                    className="project-link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {project.homepage ? (
+                      <>
+                        <ExternalLink size={16} />
+                        Visit Site
+                      </>
+                    ) : (
+                      <>
+                        <Github size={16} />
+                        View Code
+                      </>
+                    )}
+                  </a>
+                </div>
               </div>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      ) : (
+        // Desktop: 3D carousel
+        <div className="carousel" ref={carouselRef}>
+          {displayProjects.map((project, index) => {
+            const cardStyle = getCardTransform(index);
+            const cardClassName = getCardClassName(index);
+            
+            return (
+              <div
+                key={project.id}
+                className={cardClassName}
+                style={cardStyle}
+                onMouseDown={handleStart}
+                onTouchStart={handleStart}
+                onDragStart={(e) => e.preventDefault()}
+                onClick={(e) => handleCardClick(e, index)}
+              >
+                <div className="reflection"></div>
+                <div className="card-top-row">
+                  {project.language && (
+                    <div 
+                      className="language-badge"
+                      style={{ borderColor: getLanguageColor(project.language) }}
+                    >
+                      <span 
+                        className="language-dot" 
+                        style={{ backgroundColor: getLanguageColor(project.language) }}
+                      ></span>
+                      {project.language}
+                    </div>
+                  )}
+                  {project.stars !== undefined && (
+                    <div className="stars-badge">
+                      <span>⭐</span>
+                      <span>{project.stars}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="project-header">
+                  <h3>{project.displayName || project.name}</h3>
+                </div>
+                <p>{project.displayDescription}</p>
+                <div className="project-footer">
+                  <a 
+                    href={project.url} 
+                    className="project-link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {project.homepage ? (
+                      <>
+                        <ExternalLink size={16} />
+                        Visit Site
+                      </>
+                    ) : (
+                      <>
+                        <Github size={16} />
+                        View Code
+                      </>
+                    )}
+                  </a>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
