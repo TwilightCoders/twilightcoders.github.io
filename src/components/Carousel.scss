@@ -1,538 +1,154 @@
-@use 'sass:math';
 @use '../styles/variables';
 @use '../styles/mixins';
 
 .carousel-container {
   position: relative;
-  width: 100%;
-  height: variables.$carousel-height;
-  overflow: visible;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  perspective: 1000px;
-
-  @include mixins.mobile {
-    height: variables.$mobile-carousel-height;
-    padding: 0;
-    margin-top: -5vh;
-    overflow: visible; // Show cards properly on mobile
-  }
-}
-
-.carousel {
-  position: relative;
-  width: 900px;
-  height: 100%;
-  transition: transform variables.$transition-slow variables.$transition-smooth;
-  cursor: default;
-  transform-style: preserve-3d;
-  display: flex;
-  align-items: center;
-  @include mixins.no-select;
-
-  @include mixins.mobile {
-    width: 100vw;
-    transform-style: flat; // Use flat transforms on mobile for simpler layout
-  }
-
-  &.dragging {
-    cursor: grabbing;
-    transition: none;
-
-    .project-card {
-      cursor: grabbing;
-      transition: none;
-    }
-  }
-}
-
-.project-card {
-  position: absolute;
-  width: variables.$card-width;
-  height: variables.$card-height;
-  background: linear-gradient(145deg, variables.$bg-card, variables.$bg-card-secondary);
-  border-radius: variables.$radius-lg;
-  padding: 2rem 1.5rem;
-  border: 1px solid rgba(variables.$accent-gold, 0.3);
-  @include mixins.card-shadow;
-  transition: transform variables.$transition-carousel variables.$transition-smooth, 
-              opacity variables.$transition-fast ease, 
-              filter variables.$transition-fast ease;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  text-align: center;
-  left: 50%;
-  top: 50%;
-  margin-left: -#{math.div(variables.$card-width, 2)};
-  margin-top: -#{math.div(variables.$card-height, 2)};
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1000px;
+  height: min(520px, 65vh);
+  margin: 0 auto;
+}
+
+.carousel-scene {
+  width: 100%;
+  height: 420px;
+  position: relative;
+  perspective: 1200px;
+  perspective-origin: 50% 50%;
+  overflow: visible;
   cursor: grab;
-  @include mixins.no-select;
+  user-select: none;
+  -webkit-user-select: none;
 
   &:active {
     cursor: grabbing;
   }
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 40%;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
-    border-radius: variables.$radius-lg variables.$radius-lg 0 0;
-    pointer-events: none;
-  }
-
-  .reflection {
-    display: none;
-  }
-
-  &.active {
-    z-index: variables.$z-carousel-active;
-    filter: brightness(1.1);
-  }
-
-  &.side {
-    opacity: 0.8;
-    filter: brightness(0.9);
-  }
-
-  &.hidden {
-    opacity: 0;
-    pointer-events: none;
-    visibility: hidden;
-    backdrop-filter: none !important;
-    filter: none !important;
-
-    .reflection {
-      display: none;
-    }
-  }
-
-  &.dealing {
-    transition: transform variables.$transition-dealing-time variables.$transition-dealing, 
-                opacity variables.$transition-fast ease, 
-                filter variables.$transition-fast ease;
-  }
-
-  .card-top-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 0.8rem;
-    position: relative;
-    z-index: 10;
-    margin-top: -0.5rem;
-    margin-left: -0.5rem;
-    margin-right: -0.5rem;
-    pointer-events: none; // Allow drag events to pass through
-  }
-
-  .stars-badge {
-    display: flex;
-    align-items: center;
-    gap: 0.2rem;
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.9);
-    background: rgba(0, 0, 0, 0.4);
-    padding: 0.2rem 0.4rem;
-    border-radius: variables.$radius-sm;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    font-weight: 500;
-    pointer-events: auto; // Re-enable for the badge itself
-  }
-
-  .project-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 1rem;
-    
-    h3 {
-      color: variables.$accent-gold;
-      margin-bottom: 0.5rem;
-      font-size: 1.4rem;
-      font-weight: bold;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-      text-align: center;
-    }
-  }
-
-  .language-badge {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.9);
-    background: rgba(0, 0, 0, 0.4);
-    padding: 0.2rem 0.4rem;
-    border-radius: variables.$radius-sm;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    pointer-events: auto; // Re-enable for the badge itself
-
-    .language-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: variables.$radius-circle;
-      filter: saturate(1.4) brightness(1.2);
-    }
-  }
-
-  p {
-    opacity: 0.9;
-    line-height: 1.6;
-    margin-bottom: 1rem;
-    flex-grow: 1;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  }
-
-  .project-footer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  @include mixins.mobile {
-    width: variables.$mobile-card-width;
-    height: variables.$mobile-card-height;
-    margin-left: -#{math.div(variables.$mobile-card-width, 2)};
-    margin-top: -#{math.div(variables.$mobile-card-height, 2)};
-    padding: 1.5rem 1rem;
-    
-    .project-header h3 {
-      font-size: 1.4rem;
-    }
-    
-    p {
-      font-size: 1rem;
-      line-height: 1.6;
-    }
-    
-    .project-link {
-      padding: 0.8rem 1.5rem;
-      font-size: 0.9rem;
-      
-      svg {
-        width: 14px;
-        height: 14px;
-      }
-    }
-  }
-  
-  @include mixins.small-mobile {
-    width: 85vw;
-    max-width: 300px;
-    height: 360px;
-    padding: 1.5rem 1rem;
+  * {
+    user-select: none;
+    -webkit-user-select: none;
   }
 }
 
-// Mobile horizontal scroll layout
-.mobile-carousel-scroll {
+.carousel {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  // Center the rotation origin
+  margin-left: 0;
+  transform-origin: 50% 50%;
+  // Shift left so the center of the carousel is at center of scene
+  // The carousel div itself is positioned at left:50%, so its left edge
+  // is at center. We need the transform origin to be the center.
+  width: 0;
+}
+
+.carousel-cell {
+  position: absolute;
+  width: 280px;
+  height: 370px;
+  // Center each cell on the carousel's origin point
+  left: -140px;
+  top: 25px;
   display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  gap: 0; // No gap between cards
-  padding: 0; // No container padding
-  scrollbar-width: none; // Firefox
-  -ms-overflow-style: none; // IE/Edge
-  height: 100%; // Fill available space
-  align-items: center; // Center cards vertically
-  
-  // Force exact pixel alignment with horizontal padding
-  scroll-padding: 0 1.5rem; // Match card edge padding for proper snap positioning
-  scroll-snap-stop: always;
-  
-  // Additional properties for real device compatibility
-  -webkit-overflow-scrolling: touch; // Smooth scrolling on iOS
-  scroll-padding-inline: 1.5rem; // Alternative property for better support
-  
-  &::-webkit-scrollbar {
-    display: none; // Chrome/Safari
+  align-items: stretch;
+  justify-content: center;
+  backface-visibility: hidden;
+  transition: opacity 0.4s ease, filter 0.4s ease;
+  // Cards further back appear dimmer
+  opacity: 0.45;
+  filter: brightness(0.6);
+
+  &--front {
+    opacity: 1;
+    filter: brightness(1);
+    z-index: 1;
   }
-  
-  @include mixins.mobile {
-    width: 100vw; // Exact viewport width
-    max-width: 100vw;
-    padding: 0;
-    gap: 0;
-    height: 100%; // Fill available space
+
+  & > * {
+    width: 100%;
   }
 }
 
-.mobile-project-card {
-  flex: 0 0 100vw; // Full viewport width, no grow/shrink
-  scroll-snap-align: center; // Back to center alignment
-  padding: 0 1.5rem; // Add back edge padding for mobile
+// Navigation dots — outside the 3D scene so perspective doesn't distort them
+.carousel-dots {
   display: flex;
   justify-content: center;
-  align-items: center;
-  min-height: 60vh;
-  box-sizing: border-box;
-  
-  @include mixins.mobile {
-    padding: 0 1.5rem; // Edge padding for mobile
-    min-height: 50vh;
-  }
-  
-  @include mixins.small-mobile {
-    padding: 0 0.5rem; // Edge padding for small mobile
-    min-height: 45vh;
+  gap: 10px;
+  margin-top: 1rem;
+  transform: none;
+
+  .carousel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: none;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.25);
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    &.active {
+      background: variables.$accent-gold;
+      box-shadow: 0 0 6px rgba(variables.$accent-gold, 0.5);
+    }
   }
 }
 
-.mobile-project-card-inner {
-  width: 100%; // Full width of the padded container
-  max-width: 800px;
-  background: linear-gradient(145deg, variables.$bg-card, variables.$bg-card-secondary);
-  border-radius: variables.$radius-xl;
-  padding: 3rem;
-  border: 1px solid rgba(variables.$accent-gold, 0.3);
-  @include mixins.card-shadow;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  text-align: center;
-  box-sizing: border-box;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 40%;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
-    border-radius: variables.$radius-xl variables.$radius-xl 0 0; // Match the border radius
-    pointer-events: none;
-  }
-
-  .card-top-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 0.8rem;
-    position: relative;
-    z-index: 10;
-    margin-top: -0.5rem;
-    margin-left: -0.5rem;
-    margin-right: -0.5rem;
-  }
-
-  .stars-badge {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    font-size: 0.8rem;
-    color: #fff;
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.3));
-    padding: 0.3rem 0.6rem;
-    border-radius: variables.$radius-md;
-    border: 1px solid rgba(255, 215, 0, 0.4);
-    font-weight: 600;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.2);
-  }
-
-  .language-badge {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.8rem;
-    color: #fff;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
-    padding: 0.3rem 0.6rem;
-    border-radius: variables.$radius-md;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    font-weight: 500;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-
-    .language-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: variables.$radius-circle;
-      filter: saturate(1.6) brightness(1.3);
-      box-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
-    }
-  }
-
-  .project-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 1rem;
-    
-    h3 {
-      color: variables.$accent-gold;
-      margin-bottom: 0.5rem;
-      font-size: 1.3rem;
-      font-weight: bold;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-      text-align: center;
-    }
-  }
-
-  p {
-    opacity: 0.9;
-    line-height: 1.5;
-    margin-bottom: 1rem;
-    flex-grow: 1;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-    font-size: 0.95rem;
-  }
-
-  .project-footer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  @include mixins.mobile {
-    width: calc(100vw - 3rem); // Full viewport width minus total margin
-    padding: 1.5rem 1.2rem;
-    border-radius: variables.$radius-xl; // Keep consistent with default
-  }
-  
-  @include mixins.small-mobile {
-    width: calc(100vw - 1rem); // Full viewport width minus total margin
-    padding: 1.5rem 1rem;
-    border-radius: variables.$radius-xl; // Keep consistent with default
-  }
-}
-
-// Loading and error states
 .carousel-loading,
 .carousel-error {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: variables.$carousel-height;
-  color: #fff;
+  padding: 3rem;
   text-align: center;
-
-  p {
-    margin-top: 1rem;
-    font-size: 1.1rem;
-    opacity: 0.8;
-  }
-
-  @include mixins.mobile {
-    height: variables.$mobile-carousel-height;
-  }
-}
-
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(variables.$accent-gold, 0.3);
-  border-top: 3px solid variables.$accent-gold;
-  border-radius: variables.$radius-circle;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.project-link {
-  color: variables.$accent-gold;
-  text-decoration: none;
-  font-weight: bold;
-  transition: all variables.$transition-fast ease;
-  padding: 0.8rem 1.5rem;
-  border: 2px solid rgba(variables.$accent-gold, 0.3);
-  border-radius: variables.$radius-pill;
-  background: rgba(variables.$accent-gold, 0.1);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-size: 0.9rem;
-
-  svg {
-    width: 14px;
-    height: 14px;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-
-  &:hover {
-    color: #fff;
-    background: rgba(variables.$accent-gold, 0.2);
-    border-color: rgba(variables.$accent-gold, 0.6);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(variables.$accent-gold, 0.3);
-  }
-}
-
-// Contact section styles (keep them with carousel for now)
-.contact-section {
-  margin-top: 3rem;
-}
-
-.contact-links {
-  display: flex;
-  gap: 2rem;
-  justify-content: center !important;
-  align-items: center;
-  flex-wrap: wrap;
-  width: 100%;
-  margin: 1.5rem auto;
-  text-align: center;
-
-  @include mixins.mobile {
-    gap: 1rem;
-    flex-direction: row; // Keep side-by-side on mobile
-    align-items: center;
-    justify-content: center !important;
-    width: 100%;
-    margin: 1rem auto;
-  }
-  
-  @include mixins.small-mobile {
-    gap: 0.8rem;
-  }
-}
-
-.contact-link {
-  color: variables.$accent-gold;
-  text-decoration: none;
-  font-size: 1.1rem;
-  transition: color variables.$transition-fast ease;
-  padding: 0.5rem 1rem;
-  border: 1px solid rgba(variables.$accent-gold, 0.3);
-  border-radius: variables.$radius-pill;
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: variables.$radius-lg;
   background: rgba(255, 255, 255, 0.05);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
 
-  &:hover {
-    color: #fff;
-    background: rgba(variables.$accent-gold, 0.1);
+.carousel-error {
+  color: #ff6b6b;
+}
+
+// Mobile adjustments
+@include mixins.mobile {
+  .carousel-container {
+    max-width: 100%;
+    padding: 0 1rem;
+    height: min(420px, 55vh);
   }
-  
-  @include mixins.mobile {
-    font-size: 1rem;
-    padding: 0.6rem 1.2rem;
-    text-align: center;
-    min-width: 120px;
+
+  .carousel-scene {
+    height: 350px;
+    perspective: 800px;
   }
-  
-  @include mixins.small-mobile {
-    font-size: 0.9rem;
-    padding: 0.5rem 1rem;
-    min-width: 100px;
+
+  .carousel-cell {
+    width: 240px;
+    height: 310px;
+    left: -120px;
+    top: 20px;
+  }
+
+  .carousel-dots {
+    gap: 8px;
+    margin-top: 1.5rem;
+
+    .carousel-dot {
+      width: 10px;
+      height: 10px;
+    }
   }
 }
