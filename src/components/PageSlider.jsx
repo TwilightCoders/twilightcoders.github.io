@@ -183,9 +183,8 @@ const PageSlider = () => {
       // Mobile: vertical scrolling - no transform needed, let CSS handle it
       return { x: 0, y: 0 };
     } else {
-      // Desktop: horizontal sliding
-      const adjustedIndex = currentIndex - 1;
-      return { x: `${-adjustedIndex * 100}vw` };
+      // Desktop: horizontal sliding - use currentIndex directly
+      return { x: `${-currentIndex * 100}vw` };
     }
   };
   
@@ -202,31 +201,41 @@ const PageSlider = () => {
         </div>
       )}
       
-      {/* Unified page slider - configuration-based rendering */}
+      {/* Unified page rendering - mobile uses slider, desktop shows single page */}
       {(() => {
         const pages = getFilteredPages(isMobile);
-        const SliderComponent = isMobile ? 'ul' : motion.ul;
-        const sliderProps = isMobile ? 
-          { className: "page-slider" } : 
-          {
-            className: "page-slider",
-            initial: getTransform(),
-            animate: getTransform(),
-            transition: {
-              duration: 0.4 * Math.abs(direction || 1),
-              ease: [0.4, 0.0, 0.2, 1]
-            }
-          };
-
-        return (
-          <SliderComponent {...sliderProps}>
-            {pages.map((page, index) => (
-              <li key={page.path} className={`page-slide ${page.pageClass || ''}`}>
-                {renderPageContent(page, isMobile)}
-              </li>
-            ))}
-          </SliderComponent>
-        );
+        
+        if (isMobile) {
+          // Mobile: render all pages in a slider
+          return (
+            <ul className="page-slider">
+              {pages.map((page, index) => (
+                <li key={page.path} className={`page-slide ${page.pageClass || ''}`}>
+                  {renderPageContent(page, isMobile)}
+                </li>
+              ))}
+            </ul>
+          );
+        } else {
+          // Desktop: render only the current page with animation
+          const currentPage = pages.find(page => page.path === location.pathname);
+          if (!currentPage) return null;
+          
+          return (
+            <motion.div 
+              key={currentPage.path}
+              className={`single-page ${currentPage.pageClass || ''}`}
+              initial={{ opacity: 0, x: direction > 0 ? 100 : -100 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ 
+                duration: 0.4 * Math.abs(direction || 1),
+                ease: [0.4, 0.0, 0.2, 1] 
+              }}
+            >
+              {renderPageContent(currentPage, isMobile)}
+            </motion.div>
+          );
+        }
       })()}
       
       {/* Newsletter Modal */}

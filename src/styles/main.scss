@@ -71,7 +71,7 @@ html, body {
   color: #fff;
   padding: 1rem 1rem 1rem 1rem;
   box-sizing: border-box;
-  overflow: hidden; // Prevent content from showing outside viewport
+  // overflow: hidden; // Commented out to allow footer to show on desktop
   
   @include mixins.mobile {
     overflow-y: auto; // Allow vertical scrolling on mobile

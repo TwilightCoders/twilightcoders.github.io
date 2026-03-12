@@ -11,10 +11,10 @@ $bg-card: rgba(40, 42, 58, 1);
 $bg-card-secondary: rgba(30, 32, 48, 1);
 $bg-overlay: rgba(40, 42, 58, 0.8);
 
-// Spacing
-$carousel-height: 500px;
-$card-width: 280px;
-$card-height: 350px;
+// Spacing - responsive to viewport with reasonable limits
+$carousel-height: min(500px, 60vh); // Scale with viewport but cap at 500px
+$card-width: min(280px, 18vw);       // Scale with viewport but cap at 280px  
+$card-height: min(360px, 45vh);      // Scale with viewport but cap at 360px
 
 // Mobile spacing
 $mobile-carousel-height: 400px;
