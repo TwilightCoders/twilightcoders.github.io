@@ -59,22 +59,24 @@ const NewsletterModal = () => {
             />
             
             {/* Modal Content */}
-            <motion.div
-              className="modal-container"
-              initial={{ opacity: 0, scale: 0.9, y: 50 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 50 }}
-              transition={{ type: "spring", duration: 0.3 }}
-            >
-              <button 
-                className="modal-close"
-                onClick={closeModal}
-                aria-label="Close modal"
+            <div className="modal-container">
+              <motion.div
+                className="modal-card"
+                initial={{ opacity: 0, scale: 0.9, y: 50 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 50 }}
+                transition={{ type: "spring", duration: 0.3 }}
               >
-                ×
-              </button>
-              <NewsletterSignup />
-            </motion.div>
+                <button
+                  className="modal-close"
+                  onClick={closeModal}
+                  aria-label="Close modal"
+                >
+                  ×
+                </button>
+                <NewsletterSignup />
+              </motion.div>
+            </div>
           </>
         )}
       </AnimatePresence>

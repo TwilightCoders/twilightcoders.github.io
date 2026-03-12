@@ -62,38 +62,47 @@
 // Modal container
 .modal-container {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: variables.$z-modal + 1;
+  pointer-events: none;
+}
+
+.modal-card {
   width: 90%;
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
-  z-index: variables.$z-modal + 1;
+  background: linear-gradient(145deg, variables.$bg-card, variables.$bg-card-secondary);
+  border: 1px solid rgba(variables.$accent-gold, 0.3);
+  border-radius: variables.$radius-xl;
+  padding: 2.5rem 2rem;
+  position: relative;
+  pointer-events: auto;
+  @include mixins.card-shadow;
   
-  // Close button
   .modal-close {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
-    width: 2rem;
-    height: 2rem;
-    background: rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: variables.$radius-circle;
-    color: #fff;
-    font-size: 1.2rem;
-    font-weight: bold;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1.4rem;
+    line-height: 1;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 10;
-    transition: all variables.$transition-fast ease;
-    
+    transition: color variables.$transition-fast ease;
+
     &:hover {
-      background: rgba(0, 0, 0, 0.8);
-      border-color: rgba(255, 255, 255, 0.5);
+      color: #fff;
     }
   }
 

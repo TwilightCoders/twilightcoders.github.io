@@ -135,6 +135,34 @@
     }
   }
 
+  .contact-links {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+
+    .contact-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.4rem;
+      border-radius: variables.$radius-pill;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(variables.$accent-gold, 0.3);
+      color: variables.$accent-gold;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all 0.25s ease;
+
+      &:hover {
+        background: rgba(variables.$accent-gold, 0.15);
+        border-color: variables.$accent-gold;
+        box-shadow: 0 0 12px rgba(variables.$accent-gold, 0.2);
+      }
+    }
+  }
+
   @include mixins.mobile {
     font-size: 0.9rem; // Smaller text
     line-height: 1.4; // Tighter line spacing
