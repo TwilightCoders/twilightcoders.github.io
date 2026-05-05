@@ -1,0 +1,92 @@
+@use '../styles/variables';
+@use '../styles/mixins';
+
+.product-card {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem 2rem;
+  @include mixins.glass-effect;
+  @include mixins.card-shadow;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    border-color: rgba(variables.$primary-purple, 0.4);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.4),
+      0 0 20px rgba(variables.$primary-purple, 0.15);
+    transform: translateY(-2px);
+    color: inherit;
+
+    .product-cta {
+      color: variables.$primary-purple;
+    }
+  }
+
+  @include mixins.mobile {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+}
+
+.product-icon {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+  width: 3.5rem;
+  height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-icon-img {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.product-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.product-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  color: #fff;
+}
+
+.product-tagline {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+.product-tech {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: variables.$radius-sm;
+  background: rgba(variables.$primary-purple, 0.15);
+  color: variables.$secondary-purple;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+
+.product-cta {
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.3);
+  transition: color 0.3s ease;
+
+  @include mixins.mobile {
+    display: none;
+  }
+}

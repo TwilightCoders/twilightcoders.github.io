@@ -6,44 +6,31 @@ $bright-purple: #e879f9;
 $accent-gold: #ffdd9d;
 
 // Background colors
-$bg-dark: #000;
-$bg-card: rgba(40, 42, 58, 1);
-$bg-card-secondary: rgba(30, 32, 48, 1);
-$bg-overlay: rgba(40, 42, 58, 0.8);
-
-// Spacing - responsive to viewport with reasonable limits
-$carousel-height: min(500px, 60vh); // Scale with viewport but cap at 500px
-$card-width: min(280px, 18vw);       // Scale with viewport but cap at 280px  
-$card-height: min(360px, 45vh);      // Scale with viewport but cap at 360px
-
-// Mobile spacing
-$mobile-carousel-height: 400px;
-$mobile-card-width: 240px;
-$mobile-card-height: 300px;
+$bg-dark: #0a0a0f;
+$bg-card: rgba(18, 16, 30, 0.7);
+$bg-card-secondary: rgba(24, 20, 40, 0.6);
+$bg-overlay: rgba(18, 16, 30, 0.8);
 
 // Transitions
 $transition-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-$transition-dealing: cubic-bezier(0.25, 0.1, 0.25, 1);
 $transition-fast: 0.3s;
 $transition-slow: 0.6s;
-$transition-carousel: 0.8s;
-$transition-dealing-time: 1.2s;
 
 // Z-indexes
 $z-canvas: 1;
 $z-content: 2;
-$z-carousel-active: 10;
 $z-navigation: 1000;
 $z-modal: 2000;
 
 // Border radius design system
-$radius-sm: 8px;     // Small elements (badges, small buttons)
-$radius-md: 12px;    // Medium elements (input fields, small cards)
-$radius-lg: 16px;    // Large elements (cards, modals)
-$radius-xl: 20px;    // Extra large elements (main cards, page cards)
-$radius-pill: 25px;  // Pill-shaped buttons and elements
-$radius-circle: 50%; // Circular elements
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$radius-xl: 20px;
+$radius-pill: 25px;
+$radius-circle: 50%;
 
 // Breakpoints
+$tablet: 1024px;
 $mobile: 768px;
 $small-mobile: 480px;

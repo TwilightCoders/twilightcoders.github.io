@@ -1,0 +1,187 @@
+@use '../styles/variables';
+@use '../styles/mixins';
+
+.hero-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: variables.$z-navigation;
+  overflow: hidden;
+  will-change: height;
+}
+
+.hero-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(variables.$bg-dark, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  will-change: opacity;
+}
+
+// Collapsed nav bar
+.hero-navbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  z-index: 2;
+
+  @include mixins.mobile {
+    padding: 0 1rem;
+  }
+}
+
+.nav-brand {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  @include mixins.gradient-text(
+    variables.$bright-purple,
+    variables.$primary-purple,
+    variables.$secondary-purple
+  );
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  @include mixins.mobile {
+    font-size: 0.7rem;
+  }
+}
+
+.hero-nav-links {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.nav-link {
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: variables.$radius-sm;
+  transition: color 0.2s ease;
+  position: relative;
+
+  &:hover {
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  &.active {
+    color: #fff;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0.75rem;
+      right: 0.75rem;
+      height: 2px;
+      background: variables.$primary-purple;
+      border-radius: 1px;
+    }
+  }
+
+  @include mixins.mobile {
+    font-size: 0.8rem;
+    padding: 0.35rem 0.5rem;
+  }
+}
+
+// Centered hero content
+.hero-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 1;
+  padding: 2rem;
+  will-change: opacity, transform;
+}
+
+.hero-logo {
+  font-size: clamp(2.5rem, 8vw, 6rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  margin-bottom: 1rem;
+  position: relative;
+  @include mixins.gradient-text(
+    variables.$bright-purple 0%,
+    #d946ef 25%,
+    variables.$primary-purple 50%,
+    variables.$secondary-purple 75%,
+    variables.$bright-purple 100%
+  );
+  filter: drop-shadow(0 8px 24px rgba(variables.$primary-purple, 0.3));
+
+  &::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    @include mixins.gradient-text(
+      transparent 0%,
+      rgba(variables.$bright-purple, 0.3) 25%,
+      rgba(#d946ef, 0.2) 50%,
+      rgba(variables.$primary-purple, 0.1) 75%,
+      transparent 100%
+    );
+    transform: scaleY(-0.5) translateY(10px);
+    filter: blur(2px);
+    opacity: 0.3;
+    mask: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, transparent 80%);
+    -webkit-mask: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, transparent 80%);
+    pointer-events: none;
+  }
+}
+
+.hero-tagline {
+  font-size: clamp(1.2rem, 3vw, 2.2rem);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 0.08em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  padding: 0.5rem;
+  animation: float 2.5s ease-in-out infinite;
+  transition: color 0.3s ease;
+  z-index: 1;
+
+  &:hover {
+    color: variables.$primary-purple;
+    border-color: transparent;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(8px); }
+}
+
+// Spacer pushes content below the fixed hero
+.hero-spacer {
+  height: 50vh;
+}

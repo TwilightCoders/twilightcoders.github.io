@@ -1,0 +1,67 @@
+@use '../styles/variables';
+@use '../styles/mixins';
+
+.site-footer {
+  position: relative;
+  z-index: variables.$z-content;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 4rem 2rem 2rem;
+
+  @include mixins.mobile {
+    padding: 3rem 1rem 1.5rem;
+  }
+}
+
+.footer-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.footer-newsletter {
+  margin-bottom: 3rem;
+  text-align: center;
+
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: rgba(255, 255, 255, 0.85);
+  }
+}
+
+.footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  @include mixins.mobile {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+.footer-links {
+  display: flex;
+  gap: 1.5rem;
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.9rem;
+    transition: color 0.2s ease;
+    text-decoration: none;
+
+    &:hover {
+      color: variables.$primary-purple;
+    }
+  }
+}
+
+.footer-copyright {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.3);
+}

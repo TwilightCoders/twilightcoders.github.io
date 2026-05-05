@@ -1,48 +1,20 @@
 @use 'variables';
 @use 'mixins';
-@use 'page-slider';
 
 // Global styles
 html, body {
   margin: 0;
   background: variables.$bg-dark;
   height: 100%;
-  overflow: hidden;
-  font-family: 'Arial', sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
-  @include mixins.mobile {
-    // Improve touch behavior on mobile
-    touch-action: manipulation;
-    -webkit-text-size-adjust: 100%;
-  }
+  color: rgba(255, 255, 255, 0.9);
+  scroll-behavior: smooth;
 }
 
 #root {
-  height: 100vh;
   position: relative;
-  overflow: hidden; // Prevent horizontal scrollbar during transitions
-  
-  @include mixins.mobile {
-    // Handle mobile viewport units and safe areas
-    height: 100dvh; // Dynamic viewport height for mobile
-    min-height: -webkit-fill-available;
-  }
-}
-
-// Page transition styles
-.page-transition {
-  width: 100vw;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: variables.$z-content;
-  
-  &.intermediate-page {
-    z-index: variables.$z-content - 1; // Behind the main transitioning page
-  }
 }
 
 // Canvas styles
@@ -56,165 +28,15 @@ html, body {
   height: 100vh;
 }
 
-// Content overlay
-.content-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: variables.$z-content;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  color: #fff;
-  padding: 1rem 1rem 1rem 1rem;
-  box-sizing: border-box;
-  // overflow: hidden; // Commented out to allow footer to show on desktop
-  
-  @include mixins.mobile {
-    overflow-y: auto; // Allow vertical scrolling on mobile
-    padding: 0; // Remove regular padding
-    height: 100vh; // Full height for scrolling
-    scroll-snap-type: y mandatory; // Re-enable snap scrolling
-    scroll-behavior: smooth; // Smooth scrolling animation
-    scroll-padding-top: 3rem !important; // Snap-aware top padding
-  }
-  
-  @include mixins.small-mobile {
-    padding: 0.25rem 0.25rem 0.5rem 0.25rem;
-  }
-}
-
-// Header section grouping
-.header-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 1rem;
-  margin-top: 2rem;
-  
-  @include mixins.mobile {
-    margin-bottom: 0.5rem; // Less space between tagline and cards
-    padding: 0.5rem;
-    text-align: center;
-  }
-  
-  @include mixins.small-mobile {
-    margin-bottom: 0.25rem;
-    margin-top: 0;
-  }
-}
-
-// Logo styles
-.logo {
-  font-size: 4rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-  flex-shrink: 0; // Prevent logo from shrinking
-  @include mixins.gradient-text(
-    variables.$bright-purple 0%,
-    #d946ef 25%, 
-    variables.$primary-purple 50%,
-    variables.$secondary-purple 75%,
-    variables.$bright-purple 100%
-  );
-  text-shadow: 
-    0 1px 0 rgba(255,255,255,0.2),
-    0 -1px 0 rgba(255,255,255,0.1),
-    1px 0 0 rgba(255,255,255,0.1),
-    -1px 0 0 rgba(255,255,255,0.1),
-    0 2px 4px rgba(0,0,0,0.3),
-    0 4px 8px rgba(variables.$primary-purple, 0.3);
-  filter: drop-shadow(0 8px 16px rgba(variables.$primary-purple, 0.2));
+// Main content wrapper
+main {
   position: relative;
-
-  &::after {
-    content: attr(data-text);
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    @include mixins.gradient-text(
-      transparent 0%,
-      rgba(variables.$bright-purple, 0.3) 25%,
-      rgba(#d946ef, 0.2) 50%,
-      rgba(variables.$primary-purple, 0.1) 75%,
-      transparent 100%
-    );
-    transform: scaleY(-0.6) translateY(20px);
-    filter: blur(1px);
-    opacity: 0.4;
-    mask: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 80%);
-    -webkit-mask: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 80%);
-    pointer-events: none;
-  }
-
-  @include mixins.mobile {
-    font-size: 2.5rem;
-    margin-bottom: 0.25rem; // Reduced spacing to bring closer to tagline
-  }
-  
-  @include mixins.small-mobile {
-    font-size: 2rem;
-    margin-bottom: 0.25rem;
-  }
+  z-index: variables.$z-content;
 }
 
-// Tagline
-.tagline {
-  font-size: 2rem;
-  font-weight: bold;
-  opacity: 0.95;
-  max-width: 600px;
-  text-shadow: 
-    2px 2px 4px rgba(0,0,0,0.8),
-    0 0 10px rgba(217, 70, 239, 0.4),
-    0 0 20px rgba(217, 70, 239, 0.2);
-  margin-bottom: 0;
-  letter-spacing: 0.5px;
-
-  @include mixins.mobile {
-    font-size: 1.5rem;
-    margin-bottom: 0;
-  }
-  
-  @include mixins.small-mobile {
-    font-size: 1.2rem;
-    margin-bottom: 0;
-  }
-}
-
-// Projects section
-.projects-section {
-  @include mixins.glass-effect(variables.$bg-overlay);
-  margin-bottom: 20%;
-  max-width: 800px;
-
-  h2 {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-    color: variables.$accent-gold;
-  }
-
-  @include mixins.mobile {
-    margin: 0 0.5rem;
-    padding: 1.5rem 1rem;
-    max-width: 100%;
-    margin-top: 0; // Remove top margin since header provides spacing
-    
-    h2 {
-      font-size: 1.5rem;
-    }
-  }
-  
-  @include mixins.small-mobile {
-    margin: 0.5rem 0.25rem;
-    padding: 1rem 0.75rem;
-    
-    h2 {
-      font-size: 1.3rem;
-    }
-  }
+// Section base styles
+section {
+  max-width: 1200px;
+  margin: 0 auto;
+  @include mixins.section-padding;
 }
