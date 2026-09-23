@@ -63,87 +63,10 @@ const cleanTitle = (title) => {
 };
 
 /**
- * Fetch GitHub token from S3 (legacy system)
- * @returns {Promise<string|null>} GitHub token or null if failed
+ * Get pinned repository names (manual insist list)
+ * @returns {Array} Array of pinned repository names
  */
-const fetchGitHubToken = async () => {
-  try {
-    const response = await fetch('https://s3.amazonaws.com/jimmyvanveen-bucket/tc_gh_token.txt');
-    if (!response.ok) {
-      throw new Error(`Failed to fetch token: ${response.status}`);
-    }
-    const token = await response.text();
-    return token.trim();
-  } catch (error) {
-    console.warn('Could not fetch GitHub token:', error.message);
-    return null;
-  }
-};
-
-/**
- * Fetch repositories pinned to the organization homepage
- * @returns {Promise<Array>} Array of pinned repository names from GitHub
- */
-const fetchHomepagePinnedRepositories = async () => {
-  try {
-    // Get the GitHub token
-    const token = await fetchGitHubToken();
-    if (!token) {
-      throw new Error('No GitHub token available');
-    }
-
-    // GitHub GraphQL query to get pinned repositories
-    const query = `
-      query {
-        organization(login: "${ORG_NAME}") {
-          pinnedItems(first: 6, types: [REPOSITORY]) {
-            nodes {
-              ... on Repository {
-                name
-              }
-            }
-          }
-        }
-      }
-    `;
-
-    const response = await fetch('https://api.github.com/graphql', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ query })
-    });
-
-    if (!response.ok) {
-      throw new Error(`GitHub GraphQL API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    
-    if (data.errors) {
-      throw new Error(`GraphQL errors: ${data.errors.map(e => e.message).join(', ')}`);
-    }
-
-    return data.data?.organization?.pinnedItems?.nodes?.map(repo => repo.name) || [];
-  } catch (error) {
-    console.warn('Could not fetch homepage pinned repositories, falling back to manual list:', error.message);
-    return [];
-  }
-};
-
-/**
- * Get combined pinned repositories list (homepage + manual insist list)
- * @returns {Promise<Array>} Array of pinned repository names
- */
-const getPinnedRepositories = async () => {
-  const homepagePinned = await fetchHomepagePinnedRepositories();
-  const manualPinned = REPOSITORY_INSISTLIST;
-  
-  // Combine both lists, with manual insist list taking priority
-  return [...new Set([...manualPinned, ...homepagePinned])];
-};
+const getPinnedRepositories = () => REPOSITORY_INSISTLIST;
 
 // Persistent cache using localStorage to avoid hitting rate limits
 const CACHE_KEY = 'twilight_coders_repos';
@@ -203,7 +126,7 @@ export const fetchRepositories = async (limit = 6) => {
     const filteredRepos = repos.filter(repo => !REPOSITORY_BLOCKLIST.includes(repo.name));
     
     // Get pinned repositories (both homepage and manual insist list)
-    const pinnedRepoNames = await getPinnedRepositories();
+    const pinnedRepoNames = getPinnedRepositories();
     
     // Sort repositories by priority: pinned > stars > recent activity
     const sortedRepos = filteredRepos.sort((a, b) => {
