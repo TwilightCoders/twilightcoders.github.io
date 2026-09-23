@@ -1,12 +1,33 @@
-# React + Vite
+# twilightcoders.net
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The open-source home of Twilight Coders. Commercial products live at
+[twilightcoders.com](https://twilightcoders.com).
 
-Currently, two official plugins are available:
+This is the organisation's GitHub Pages user site, so it owns the
+`twilightcoders.net` custom domain for every project site too
+(`twilightcoders.net/monopolia/`, …).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Develop
 
-## Expanding the ESLint configuration
+```bash
+npm ci
+npm run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Deploy
+
+Push to `main`. `.github/workflows/deploy.yml` builds with Vite and publishes
+`dist/` through GitHub Pages. `public/CNAME` carries the custom domain.
+
+## History
+
+`main` carries the full source history, which began in the private
+`TwilightCoders/www` repo. Earlier eras are kept as branches:
+
+| Branch | Contents |
+|---|---|
+| `archive/source-2018` | Original 2018 React/Relay source |
+| `archive/deploys-2018` | 2018 build output |
+| `archive/deploys-2025` | 2025 build output pushed here from the private repo |
+| `archive/www-gh-pages-2025` | Build output from the private repo's own `gh-pages` |
+| `archive/attempts` | 2025 design experiments |
