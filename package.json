@@ -1,33 +1,22 @@
 {
-  "name": "react-app",
-  "private": true,
-  "version": "0.0.0",
+  "name": "twilightcoders.net",
   "type": "module",
-  "homepage": "https://twilightcoders.net",
+  "version": "2.0.0",
+  "private": true,
   "scripts": {
-    "dev": "vite --host",
-    "prebuild": "node scripts/fetch-repos.mjs",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "test": "node --test scripts/"
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "test": "node --test test/"
   },
   "dependencies": {
-    "framer-motion": "^12.23.6",
-    "lucide-react": "^0.539.0",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "sass": "^1.89.2"
+    "astro": "^7.3.4"
   },
-  "devDependencies": {
-    "@eslint/js": "^9.30.1",
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
-    "@vitejs/plugin-react": "^4.6.0",
-    "eslint": "^9.30.1",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.20",
-    "globals": "^16.3.0",
-    "vite": "^5.4.10"
-  }
+  "allowScripts": {
+    "esbuild@0.28.2": true
+  },
+  "engines": {
+    "node": ">=22.18"
+  },
+  "description": "The open-source home of Twilight Coders, LLC"
 }

@@ -1,0 +1,113 @@
+---
+import { getStats, floorFigure } from '../lib/stats';
+
+const { totals } = await getStats();
+---
+
+<section id="about" class="about" aria-labelledby="about-heading">
+  <div class="wrap about-grid">
+    <div class="story">
+      <p class="eyebrow">About</p>
+      <h2 id="about-heading" class="section-title">A small studio with a long memory</h2>
+      <p>
+        Twilight Coders, LLC is an independent software studio in Colorado, led by
+        <a href="https://github.com/voltechs">Dale Stevens</a>. The GitHub organization dates to 2012,
+        and the first gem shipped in 2013. Most of what is here started the same way: a Rails app we were
+        building needed something ActiveRecord did not do, so we wrote it and published it.
+      </p>
+      <p>
+        Ruby and PostgreSQL are home. Over time the work has spread out to the machines we run: Terraform providers for our own network and storage, packaging, CI
+        runners and editor tooling.
+      </p>
+      <p>
+        The rule we try to hold is that simple, well-understood systems outperform clever ones. It shows
+        up as small libraries that each do one job, and as tools that are honest about their limits.
+      </p>
+      <p>
+        Our commercial apps, starting with <a href="https://twilightcoders.com/upuppy/">upuppy</a>, live at
+        <a href="https://twilightcoders.com">twilightcoders.com</a>.
+      </p>
+    </div>
+
+    <dl class="facts">
+      <div><dt>Organization</dt><dd>Twilight Coders, LLC</dd></div>
+      <div><dt>Based in</dt><dd>Colorado, USA</dd></div>
+      <div><dt>On GitHub since</dt><dd>2012</dd></div>
+      <div><dt>Open-source projects</dt><dd>{totals.originals}</dd></div>
+      <div><dt>Gem downloads</dt><dd>{floorFigure(totals.downloads).toLocaleString('en-US')}+</dd></div>
+      <div><dt>Mostly written in</dt><dd>Ruby, C, Go, TypeScript</dd></div>
+      <div><dt>Motto</dt><dd><em>Dream.</em> Code.</dd></div>
+    </dl>
+  </div>
+</section>
+
+<style>
+  .about {
+    padding-block: clamp(4rem, 9vw, 6.5rem);
+    border-top: 1px solid var(--hairline);
+    background: radial-gradient(900px 400px at 10% 110%, color-mix(in srgb, var(--violet) 10%, transparent), transparent 70%);
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: clamp(2rem, 6vw, 5rem);
+    align-items: start;
+  }
+
+  .story p {
+    margin-top: 1rem;
+    max-width: 40rem;
+    color: var(--ink-1);
+    font-size: 1.02rem;
+  }
+
+  .story .section-title + p {
+    margin-top: 1.4rem;
+  }
+
+  .story a {
+    color: var(--mint);
+    text-underline-offset: 0.2em;
+  }
+
+  .facts {
+    margin: 0;
+    padding: 1.4rem 1.5rem;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    background: var(--bg-1);
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .facts div {
+    display: grid;
+    gap: 0.1rem;
+  }
+
+  .facts dt {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .facts dd {
+    margin: 0;
+    color: var(--ink-0);
+    font-size: 1rem;
+  }
+
+  .facts em {
+    font-family: var(--font-display);
+    color: var(--amber);
+  }
+
+  @media (max-width: 860px) {
+    .about-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

@@ -1,0 +1,22 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import FeaturedWork from '../components/FeaturedWork.astro';
+import Catalog from '../components/Catalog.astro';
+import Upstream from '../components/Upstream.astro';
+import About from '../components/About.astro';
+import SneakPeek from '../components/SneakPeek.astro';
+
+const title = 'Twilight Coders · Open source and projects';
+const description =
+  'The open-source work of Twilight Coders, LLC: ActiveRecord extensions, Terraform providers, Ruby frameworks for the terminal, and editor tooling.';
+---
+
+<Base title={title} description={description}>
+  <Hero />
+  <FeaturedWork />
+  <Catalog />
+  <Upstream />
+  <About />
+  <SneakPeek />
+</Base>

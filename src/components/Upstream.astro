@@ -1,0 +1,89 @@
+---
+import { contributions } from '../data/projects';
+
+const stateLabel = { merged: 'Merged upstream', published: 'Published', open: 'Open' } as const;
+---
+
+<section id="upstream" class="upstream" aria-labelledby="upstream-heading">
+  <div class="wrap">
+    <p class="eyebrow">Upstream</p>
+    <h2 id="upstream-heading" class="section-title">Fixes we sent back</h2>
+    <p class="intro">
+      When a library we depend on needs work, we do it in the open and offer it to the maintainers.
+    </p>
+    <ul class="list">
+      {contributions.map((c) => (
+        <li>
+          <div class="head">
+            <a href={c.href}>{c.project}</a>
+            <span class="upstream-name">{c.upstream}</span>
+          </div>
+          <p>{c.summary}</p>
+          <p class="state">{stateLabel[c.state]} · {c.year}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .upstream {
+    padding-block: clamp(3.5rem, 8vw, 5.5rem);
+    border-top: 1px solid var(--hairline);
+  }
+
+  .intro {
+    margin-top: 0.9rem;
+    color: var(--ink-2);
+    max-width: 44rem;
+  }
+
+  .list {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+    gap: 1.25rem 2.5rem;
+  }
+
+  .list li {
+    padding-top: 1rem;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.75rem;
+  }
+
+  .head a {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: var(--ink-0);
+    text-underline-offset: 0.2em;
+    text-decoration-color: var(--hairline);
+  }
+
+  .head a:hover {
+    color: var(--amber);
+  }
+
+  .upstream-name {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ink-2);
+  }
+
+  .list p {
+    margin-top: 0.45rem;
+    font-size: 0.92rem;
+    color: var(--ink-1);
+  }
+
+  .list .state {
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    color: var(--mint);
+  }
+</style>

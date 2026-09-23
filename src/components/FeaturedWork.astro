@@ -1,0 +1,221 @@
+---
+import { Picture } from 'astro:assets';
+import { Code } from 'astro:components';
+import { featured, areas } from '../data/projects';
+import { workImage } from '../lib/media';
+import Status from './Status.astro';
+
+const areaName = Object.fromEntries(areas.map((a) => [a.id, a.name]));
+---
+
+<section id="work" class="work" aria-labelledby="work-heading">
+  <div class="wrap">
+    <p class="eyebrow">Selected work</p>
+    <h2 id="work-heading" class="section-title">The projects we’d show first</h2>
+
+    <ol class="features">
+      {featured.map((p, i) => {
+        const f = p.featured!;
+        const media = f.media?.[0];
+        const snippet = f.snippets?.[0];
+        return (
+          <li class:list={['feature', { flip: i % 2 === 1 }]}>
+            <div class="visual">
+              {media ? (
+                <Picture
+                  src={workImage(media.src)}
+                  alt={media.alt}
+                  widths={[480, 800, 1200]}
+                  sizes="(max-width: 860px) 100vw, 640px"
+                  formats={['avif', 'webp']}
+                  loading={i < 1 ? 'eager' : 'lazy'}
+                />
+              ) : snippet ? (
+                <div class="code-card">
+                  {snippet.caption && <p class="code-caption">{snippet.caption}</p>}
+                  <Code code={snippet.code} lang={snippet.lang as any} theme="tokyo-night" />
+                </div>
+              ) : null}
+            </div>
+
+            <div class="copy">
+              <p class="meta">
+                <span>{areaName[p.area]}</span>
+                <Status status={p.status} />
+              </p>
+              <h3><a href={`/work/${p.slug}/`}>{p.name}</a></h3>
+              <p class="lede">{f.lede}</p>
+              <ul class="highlights">
+                {f.highlights.slice(0, 3).map((h) => <li>{h}</li>)}
+              </ul>
+              <p class="actions">
+                <a class="more" href={`/work/${p.slug}/`}>
+                  How it works<span class="visually-hidden">: {p.name}</span> <span aria-hidden="true">→</span>
+                </a>
+                <a class="external" href={p.links[0].href}>{p.links[0].label}<span aria-hidden="true"> ↗</span></a>
+              </p>
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .work {
+    padding-block: clamp(4rem, 9vw, 6.5rem);
+  }
+
+  .features {
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
+    display: grid;
+    gap: clamp(3.5rem, 8vw, 6rem);
+  }
+
+  .feature {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    align-items: center;
+  }
+
+  .feature.flip .visual {
+    order: 2;
+  }
+
+  .visual :global(picture),
+  .visual :global(img) {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius);
+    border: 1px solid var(--hairline);
+    background: var(--bg-1);
+  }
+
+  .code-card {
+    border-radius: var(--radius);
+    border: 1px solid var(--hairline);
+    background: #1a1b26;
+    overflow: hidden;
+  }
+
+  .code-caption {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--ink-2);
+    padding: 0.65rem 1rem 0;
+  }
+
+  .code-card :global(pre) {
+    margin: 0;
+    padding: 1rem;
+    font-size: 0.82rem;
+    line-height: 1.55;
+    overflow-x: auto;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--ink-2);
+  }
+
+  .copy h3 {
+    margin-top: 0.7rem;
+    font-size: clamp(1.6rem, 3vw, 2.1rem);
+  }
+
+  .copy h3 a {
+    text-decoration: none;
+  }
+
+  .copy h3 a:hover {
+    color: var(--amber);
+  }
+
+  .lede {
+    margin-top: 0.8rem;
+    font-size: 1.02rem;
+    color: var(--ink-1);
+    max-width: 38rem;
+  }
+
+  .highlights {
+    margin-top: 1.1rem;
+    display: grid;
+    gap: 0.45rem;
+    font-size: 0.93rem;
+    color: var(--ink-1);
+  }
+
+  .highlights li {
+    padding-left: 1.2rem;
+    position: relative;
+  }
+
+  .highlights li::before {
+    content: '';
+    position: absolute;
+    left: 0.15rem;
+    top: 0.62em;
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: var(--amber);
+  }
+
+  .actions {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.88rem;
+  }
+
+  .more {
+    color: var(--bg-0);
+    background: var(--amber);
+    text-decoration: none;
+    font-weight: 700;
+    padding: 0.6rem 1rem;
+    border-radius: 999px;
+  }
+
+  .more:hover {
+    background: #ffca6a;
+  }
+
+  .external {
+    color: var(--ink-1);
+    text-decoration-color: var(--hairline);
+    text-underline-offset: 0.25em;
+    padding-block: 0.5rem;
+  }
+
+  .external:hover {
+    color: var(--ink-0);
+    text-decoration-color: var(--amber-dim);
+  }
+
+  @media (max-width: 860px) {
+    .feature {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .feature.flip .visual {
+      order: 0;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .code-card :global(pre) {
+      font-size: 0.74rem;
+    }
+  }
+</style>

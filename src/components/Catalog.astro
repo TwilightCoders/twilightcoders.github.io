@@ -1,0 +1,306 @@
+---
+import { areas, projects, type Project } from '../data/projects';
+import { statsFor, compact } from '../lib/stats';
+import Status from './Status.astro';
+
+const withStats = await Promise.all(projects.map(async (p) => ({ p, s: await statsFor(p) })));
+type Row = (typeof withStats)[number];
+
+const current = (r: Row) => r.p.status !== 'archive';
+const groups = areas
+  .map((area) => ({ area, rows: withStats.filter((r) => r.p.area === area.id && current(r)) }))
+  .filter((g) => g.rows.length);
+const archive = withStats.filter((r) => !current(r));
+
+const langClass = (lang: string) => `dot-${lang.toLowerCase().replace(/[^a-z]/g, '') || 'other'}`;
+const primaryHref = (p: Project) => (p.featured ? `/work/${p.slug}/` : p.links[0].href);
+---
+
+<section id="open-source" class="catalog" aria-labelledby="catalog-heading">
+  <div class="wrap">
+    <p class="eyebrow">The catalog</p>
+    <h2 id="catalog-heading" class="section-title">Everything we maintain in the open</h2>
+    <p class="intro">
+      Grouped by what it is for. Stars and downloads come from GitHub and RubyGems when the site is built.
+    </p>
+
+    {groups.map(({ area, rows }) => (
+      <section class="group" aria-labelledby={`area-${area.id}`}>
+        <header class="group-head">
+          <h3 id={`area-${area.id}`}>{area.name}</h3>
+          <p>{area.blurb}</p>
+        </header>
+        <ul class="cards">
+          {rows.map(({ p, s }) => (
+            <li class="card">
+              <div class="card-top">
+                <h4><a href={primaryHref(p)}>{p.name}</a></h4>
+                <Status status={p.status} />
+              </div>
+              <p class="tagline">{p.tagline}</p>
+              {p.credit && <p class="credit">{p.credit}</p>}
+              <p class="facts">
+                <span class="lang"><span class={`dot ${langClass(p.language)}`} aria-hidden="true" />{p.language}</span>
+                {!!s.stars && <span><span aria-hidden="true">★ </span>{s.stars}<span class="visually-hidden"> stars</span></span>}
+                {!!s.downloads && <span><span aria-hidden="true">↓ </span>{compact(s.downloads)}<span class="visually-hidden"> downloads</span></span>}
+                <span>since {p.since}</span>
+              </p>
+              <p class="links">
+                {p.featured && <a href={`/work/${p.slug}/`}>Details</a>}
+                {p.links.slice(0, p.featured ? 2 : 3).map((l) => <a href={l.href}>{l.label}</a>)}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+
+    <details class="archive">
+      <summary>
+        <span class="summary-title">From the archive</span>
+        <span class="summary-note">{archive.length} older projects, kept public for the people still using them</span>
+      </summary>
+      <ul class="archive-list">
+        {archive.map(({ p, s }) => (
+          <li>
+            <a href={p.links[0].href}>{p.name}</a>
+            <span class="archive-tagline">{p.tagline}</span>
+            <span class="archive-facts">
+              {p.since}{!!s.downloads && ` · ${compact(s.downloads)} downloads`}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </details>
+
+    <p class="more-on-github">
+      Smaller experiments and forks are on <a href="https://github.com/TwilightCoders">GitHub</a>.
+    </p>
+  </div>
+</section>
+
+<style>
+  .catalog {
+    padding-block: clamp(4rem, 9vw, 6.5rem);
+    background: linear-gradient(180deg, var(--bg-0), #0c0f1c 12rem);
+    border-top: 1px solid var(--hairline);
+  }
+
+  .intro {
+    margin-top: 0.9rem;
+    color: var(--ink-2);
+    max-width: 44rem;
+  }
+
+  .group {
+    margin-top: clamp(2.5rem, 6vw, 3.75rem);
+  }
+
+  .group-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 1.25rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .group-head h3 {
+    font-size: 1.35rem;
+  }
+
+  .group-head p {
+    color: var(--ink-2);
+    font-size: 0.92rem;
+    max-width: 46rem;
+  }
+
+  .cards {
+    margin-top: 1.25rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr));
+    gap: 1rem;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1.15rem 1.2rem 1.05rem;
+    background: var(--bg-1);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    transition: border-color 0.15s ease;
+  }
+
+  .card:hover {
+    border-color: var(--amber-dim);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .card h4 {
+    font-family: var(--font-mono);
+    font-size: 0.98rem;
+    font-weight: 600;
+    color: var(--ink-0);
+  }
+
+  .card h4 a {
+    text-decoration: none;
+  }
+
+  .card h4 a:hover {
+    color: var(--amber);
+  }
+
+  .tagline {
+    font-size: 0.92rem;
+    color: var(--ink-1);
+    flex: 1;
+  }
+
+  .credit {
+    font-size: 0.82rem;
+    color: var(--ink-2);
+    font-style: italic;
+  }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.9rem;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    color: var(--ink-2);
+  }
+
+  .lang {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: var(--lang-other);
+  }
+
+  .dot-ruby { background: var(--lang-ruby); }
+  .dot-go { background: var(--lang-go); }
+  .dot-typescript,
+  .dot-javascript { background: var(--lang-ts); }
+  .dot-shell { background: var(--lang-shell); }
+  .dot-c,
+  .dot-c\+\+,
+  .dot-cpp { background: var(--lang-c); }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    padding-top: 0.55rem;
+    border-top: 1px solid color-mix(in srgb, var(--hairline) 60%, transparent);
+    font-size: 0.82rem;
+  }
+
+  .links a {
+    color: var(--ink-1);
+    text-decoration-color: var(--hairline);
+    text-underline-offset: 0.2em;
+    padding-block: 0.25rem;
+  }
+
+  .links a:hover {
+    color: var(--amber);
+    text-decoration-color: var(--amber-dim);
+  }
+
+  .archive {
+    margin-top: clamp(2.5rem, 6vw, 3.75rem);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    background: var(--bg-1);
+  }
+
+  .archive summary {
+    cursor: pointer;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 1rem;
+    padding: 1rem 1.2rem;
+    list-style-position: inside;
+  }
+
+  .summary-title {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    color: var(--ink-0);
+  }
+
+  .summary-note {
+    color: var(--ink-2);
+    font-size: 0.88rem;
+  }
+
+  .archive-list {
+    padding: 0 1.2rem 1rem;
+    display: grid;
+    gap: 0.1rem;
+  }
+
+  .archive-list li {
+    display: grid;
+    grid-template-columns: minmax(10rem, 14rem) 1fr auto;
+    gap: 0.25rem 1rem;
+    padding-block: 0.55rem;
+    border-top: 1px solid color-mix(in srgb, var(--hairline) 60%, transparent);
+    font-size: 0.88rem;
+  }
+
+  .archive-list a {
+    font-family: var(--font-mono);
+    color: var(--ink-0);
+    text-underline-offset: 0.2em;
+    text-decoration-color: var(--hairline);
+  }
+
+  .archive-list a:hover {
+    color: var(--amber);
+  }
+
+  .archive-tagline {
+    color: var(--ink-1);
+  }
+
+  .archive-facts {
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+
+  @media (max-width: 700px) {
+    .archive-list li {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .more-on-github {
+    margin-top: 1.5rem;
+    color: var(--ink-2);
+    font-size: 0.92rem;
+  }
+
+  .more-on-github a {
+    color: var(--mint);
+  }
+</style>

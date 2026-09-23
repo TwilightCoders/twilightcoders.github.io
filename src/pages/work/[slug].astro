@@ -1,0 +1,393 @@
+---
+import { Picture } from 'astro:assets';
+import { Code } from 'astro:components';
+import Base from '../../layouts/Base.astro';
+import Status from '../../components/Status.astro';
+import { featured, areas, type Project } from '../../data/projects';
+import { statsFor } from '../../lib/stats';
+import { workImage } from '../../lib/media';
+
+export function getStaticPaths() {
+  return featured.map((project, i) => ({
+    params: { slug: project.slug },
+    props: {
+      project,
+      prev: featured[(i - 1 + featured.length) % featured.length],
+      next: featured[(i + 1) % featured.length],
+    },
+  }));
+}
+
+interface Props {
+  project: Project;
+  prev: Project;
+  next: Project;
+}
+
+const { project: p, prev, next } = Astro.props;
+const f = p.featured!;
+const s = await statsFor(p);
+const area = areas.find((a) => a.id === p.area)!;
+
+const facts: [string, string][] = [
+  ['Language', p.language],
+  ['Since', String(p.since)],
+  ...(s.version ? [['Latest gem', s.version] as [string, string]] : []),
+  ...(s.downloads ? [['Downloads', s.downloads.toLocaleString('en-US')] as [string, string]] : []),
+  ...(s.stars ? [['GitHub stars', String(s.stars)] as [string, string]] : []),
+  ...(s.license ? [['License', s.license] as [string, string]] : []),
+];
+---
+
+<Base title={`${p.name} · Twilight Coders`} description={p.tagline} type="article">
+  <article class="project">
+    <header class="project-head">
+      <div class="wrap">
+        <nav aria-label="Breadcrumb" class="crumbs">
+          <a href="/#work">Work</a> <span aria-hidden="true">/</span> <span>{area.name}</span>
+        </nav>
+        <div class="title-row">
+          <h1>{p.name}</h1>
+          <Status status={p.status} />
+        </div>
+        <p class="tagline">{p.tagline}</p>
+        <p class="lede">{f.lede}</p>
+      </div>
+    </header>
+
+    {f.media && (
+      <div class="wrap gallery" data-count={f.media.length}>
+        {f.media.map((m, i) => (
+          <figure>
+            <Picture
+              src={workImage(m.src)}
+              alt={m.alt}
+              widths={[640, 1000, 1600]}
+              sizes={f.media!.length > 1 && i > 0 ? '(max-width: 860px) 100vw, 560px' : '(max-width: 1180px) 100vw, 1180px'}
+              formats={['avif', 'webp']}
+              loading={i === 0 ? 'eager' : 'lazy'}
+            />
+            {m.caption && <figcaption>{m.caption}</figcaption>}
+          </figure>
+        ))}
+      </div>
+    )}
+
+    <div class="wrap body-grid">
+      <div class="prose">
+        {f.body.map((para) => <p>{para}</p>)}
+
+        <h2>Highlights</h2>
+        <ul class="highlights">
+          {f.highlights.map((h) => <li>{h}</li>)}
+        </ul>
+
+        {f.snippets && (
+          <>
+            <h2>In practice</h2>
+            {f.snippets.map((snip) => (
+              <figure class="snippet">
+                {snip.caption && <figcaption>{snip.caption}</figcaption>}
+                <Code code={snip.code} lang={snip.lang as any} theme="tokyo-night" />
+              </figure>
+            ))}
+          </>
+        )}
+
+        {f.note && <p class="note">{f.note}</p>}
+      </div>
+
+      <aside class="side" aria-label="Project facts">
+        {p.install && (
+          <div class="install">
+            <p class="label">Install</p>
+            <code>{p.install}</code>
+          </div>
+        )}
+        <dl>
+          {facts.map(([k, v]) => (
+            <div><dt>{k}</dt><dd>{v}</dd></div>
+          ))}
+        </dl>
+        <ul class="links">
+          {p.links.map((l) => <li><a href={l.href}>{l.label}<span aria-hidden="true"> ↗</span></a></li>)}
+        </ul>
+      </aside>
+    </div>
+
+    <nav class="wrap pager" aria-label="More work">
+      <a href={`/work/${prev.slug}/`} rel="prev"><span class="dir">Previous</span>{prev.name}</a>
+      <a href={`/work/${next.slug}/`} rel="next"><span class="dir">Next</span>{next.name}</a>
+    </nav>
+  </article>
+</Base>
+
+<style>
+  .project-head {
+    padding-block: clamp(3rem, 7vw, 5rem) 2rem;
+    background:
+      radial-gradient(1000px 420px at 85% -20%, color-mix(in srgb, var(--violet) 16%, transparent), transparent 60%),
+      linear-gradient(180deg, #0c0f1f, var(--bg-0));
+  }
+
+  .crumbs {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ink-2);
+  }
+
+  .crumbs a {
+    color: var(--mint);
+    text-underline-offset: 0.2em;
+  }
+
+  .title-row {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+  }
+
+  h1 {
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+  }
+
+  .tagline {
+    margin-top: 0.8rem;
+    font-size: 1.15rem;
+    color: var(--ink-0);
+    max-width: 48rem;
+  }
+
+  .lede {
+    margin-top: 0.9rem;
+    color: var(--ink-1);
+    max-width: 48rem;
+    font-size: 1.02rem;
+  }
+
+  .gallery {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: 1rem;
+  }
+
+  .gallery[data-count='2'],
+  .gallery[data-count='3'] {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .gallery[data-count='3'] figure:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .gallery figure {
+    margin: 0;
+  }
+
+  .gallery :global(img) {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius);
+    border: 1px solid var(--hairline);
+    background: var(--bg-1);
+  }
+
+  .gallery figcaption {
+    margin-top: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--ink-2);
+  }
+
+  .body-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 20rem;
+    gap: clamp(2rem, 5vw, 4rem);
+    padding-block: clamp(2.5rem, 6vw, 4rem);
+    align-items: start;
+  }
+
+  .prose > p {
+    margin-top: 1rem;
+    font-size: 1.04rem;
+    color: var(--ink-1);
+    max-width: var(--measure);
+  }
+
+  .prose > p:first-child {
+    margin-top: 0;
+  }
+
+  .prose h2 {
+    margin-top: 2.5rem;
+    font-size: 1.4rem;
+  }
+
+  .highlights {
+    margin-top: 1rem;
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .highlights li {
+    position: relative;
+    padding-left: 1.3rem;
+    color: var(--ink-1);
+  }
+
+  .highlights li::before {
+    content: '';
+    position: absolute;
+    left: 0.2rem;
+    top: 0.62em;
+    width: 0.42rem;
+    height: 0.42rem;
+    border-radius: 50%;
+    background: var(--amber);
+  }
+
+  .snippet {
+    margin: 1.1rem 0 0;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    background: #1a1b26;
+    overflow: hidden;
+  }
+
+  .snippet figcaption {
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    color: var(--ink-2);
+    padding: 0.7rem 1rem 0;
+  }
+
+  .snippet :global(pre) {
+    margin: 0;
+    padding: 1rem;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    overflow-x: auto;
+  }
+
+  .note {
+    margin-top: 2rem !important;
+    padding: 1rem 1.15rem;
+    border-left: 3px solid var(--amber-dim);
+    background: var(--bg-1);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: 0.95rem !important;
+  }
+
+  .side {
+    position: sticky;
+    top: 5rem;
+    display: grid;
+    gap: 1.25rem;
+    padding: 1.35rem;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    background: var(--bg-1);
+  }
+
+  .label,
+  .side dt {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .install code {
+    display: block;
+    margin-top: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--mint);
+    overflow-wrap: anywhere;
+  }
+
+  .side dl {
+    margin: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .side dd {
+    margin: 0.1rem 0 0;
+    color: var(--ink-0);
+  }
+
+  .links {
+    display: grid;
+    gap: 0.2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .links a {
+    display: inline-block;
+    padding-block: 0.3rem;
+    color: var(--ink-1);
+    text-underline-offset: 0.2em;
+    text-decoration-color: var(--hairline);
+  }
+
+  .links a:hover {
+    color: var(--amber);
+  }
+
+  .pager {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 2rem 4rem;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .pager a {
+    display: grid;
+    gap: 0.2rem;
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    color: var(--ink-0);
+  }
+
+  .pager a[rel='next'] {
+    text-align: right;
+  }
+
+  .pager a:hover {
+    color: var(--amber);
+  }
+
+  .dir {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 860px) {
+    .body-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .side {
+      position: static;
+    }
+    .gallery[data-count='2'],
+    .gallery[data-count='3'] {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 520px) {
+    .snippet :global(pre) {
+      font-size: 0.74rem;
+    }
+  }
+</style>

@@ -1,0 +1,62 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Not found · Twilight Coders" description="That page is not here.">
+  <section class="lost">
+    <div class="wrap">
+      <p class="eyebrow">404</p>
+      <h1>Nothing at this address.</h1>
+      <p>
+        Project sites such as <a href="/monopolia/">Monopolia</a> live under their own paths.
+        If you followed a link here, the page may have moved.
+      </p>
+      <p class="actions">
+        <a class="home" href="/">Back to the workshop</a>
+        <a href="https://github.com/TwilightCoders">Browse GitHub</a>
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .lost {
+    padding-block: clamp(5rem, 14vw, 9rem);
+    background: linear-gradient(180deg, #0c0f1f, var(--bg-0));
+  }
+
+  h1 {
+    margin-top: 0.8rem;
+    font-size: clamp(2rem, 5vw, 3rem);
+  }
+
+  p {
+    margin-top: 1rem;
+    max-width: 40rem;
+    color: var(--ink-1);
+  }
+
+  a {
+    color: var(--mint);
+    text-underline-offset: 0.2em;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 1.5rem;
+    align-items: center;
+    margin-top: 2rem;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+  }
+
+  .home {
+    color: var(--bg-0);
+    background: var(--amber);
+    text-decoration: none;
+    font-weight: 700;
+    padding: 0.65rem 1.1rem;
+    border-radius: 999px;
+  }
+</style>

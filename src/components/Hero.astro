@@ -1,0 +1,191 @@
+---
+import { getStats, floorFigure } from '../lib/stats';
+
+const { totals } = await getStats();
+const downloads = floorFigure(totals.downloads).toLocaleString('en-US');
+
+// Deterministic pseudo-random starfield, computed once at build — no
+// runtime randomness, no client JS, same output every render.
+function seeded(n: number): number {
+  const x = Math.sin(n * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+const stars = Array.from({ length: 46 }, (_, i) => {
+  const top = (seeded(i * 3 + 1) * 78).toFixed(2);
+  const left = (seeded(i * 3 + 2) * 100).toFixed(2);
+  const size = (seeded(i * 3 + 3) * 1.6 + 0.6).toFixed(2);
+  const delay = (seeded(i * 7 + 4) * 6).toFixed(2);
+  const dur = (seeded(i * 11 + 5) * 3 + 3).toFixed(2);
+  return { top, left, size, delay, dur };
+});
+---
+
+<section class="hero" aria-label="Introduction">
+  <div class="sky" aria-hidden="true">
+    {stars.map((s) => (
+      <span
+        class="star"
+        style={`top:${s.top}%; left:${s.left}%; width:${s.size}px; height:${s.size}px; animation-delay:${s.delay}s; animation-duration:${s.dur}s;`}
+      />
+    ))}
+    <div class="horizon"></div>
+  </div>
+
+  <div class="wrap hero-inner">
+    <p class="eyebrow">Twilight Coders, LLC · Colorado · Open source since 2013</p>
+    <h1>
+      We build <em>quiet, reliable</em> software, from the database layer
+      to the tools on our own desks.
+    </h1>
+    <p class="lede">
+      This is the open-source side of the studio: a decade of ActiveRecord
+      extensions, Terraform providers for our own rack, and
+      the editor and terminal tools we wanted and could not find.
+    </p>
+
+    <dl class="figures">
+      <div><dt>RubyGems downloads</dt><dd>{downloads}+</dd></div>
+      <div><dt>Open-source projects</dt><dd>{totals.originals}</dd></div>
+      <div><dt>Publishing since</dt><dd>2013</dd></div>
+    </dl>
+
+    <div class="cta-row">
+      <a class="cta cta-primary" href="#work">See the work <span aria-hidden="true">↓</span></a>
+      <a class="cta cta-ghost" href="https://github.com/TwilightCoders">github.com/TwilightCoders</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: clip;
+    padding-block: clamp(3.5rem, 9vw, 6.5rem) clamp(3rem, 7vw, 5rem);
+    background: var(--bg-0);
+  }
+
+  .sky {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(1200px 500px at 82% -10%, color-mix(in srgb, var(--violet) 20%, transparent), transparent 60%),
+      linear-gradient(180deg, #0a0c17 0%, #10132a 42%, #1c1a3a 68%, #2c2350 84%, #3a2b52 100%);
+  }
+
+  .horizon {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px;
+    height: 40%;
+    background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--amber) 9%, transparent) 92%);
+    pointer-events: none;
+  }
+
+  .star {
+    position: absolute;
+    display: block;
+    border-radius: 50%;
+    background: var(--ink-0);
+    opacity: 0.55;
+    animation: twinkle ease-in-out infinite;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.85; }
+  }
+
+  .hero-inner {
+    position: relative;
+    max-width: 50rem;
+  }
+
+  .hero h1 {
+    margin-top: 0.85rem;
+    font-size: clamp(1.9rem, 4.2vw, 3rem);
+    font-weight: 600;
+    color: var(--ink-0);
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--mint);
+  }
+
+  .lede {
+    margin-top: 1.15rem;
+    max-width: 42rem;
+    font-size: 1.05rem;
+    color: var(--ink-1);
+  }
+
+  .figures {
+    margin: 2rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem clamp(1.5rem, 5vw, 3.5rem);
+  }
+
+  .figures div {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+
+  .figures dt {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .figures dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3.2vw, 2.1rem);
+    font-weight: 600;
+    color: var(--amber);
+    line-height: 1.1;
+  }
+
+  .cta-row {
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+  }
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-decoration: none;
+    padding: 0.7rem 1.1rem;
+    border-radius: 999px;
+    font-size: 0.94rem;
+    font-family: var(--font-mono);
+  }
+
+  .cta-primary {
+    background: var(--amber);
+    color: #1a1206;
+    font-weight: 700;
+  }
+
+  .cta-primary:hover {
+    background: #ffca6a;
+  }
+
+  .cta-ghost {
+    border: 1px solid var(--hairline);
+    color: var(--ink-1);
+  }
+
+  .cta-ghost:hover {
+    border-color: var(--amber-dim);
+    color: var(--ink-0);
+  }
+</style>

@@ -1,0 +1,188 @@
+/* ---------------------------------------------------------------------
+   Twilight Coders — global tokens & reset
+   One deliberate theme: twilight-dark. No light-mode toggle — see
+   DESIGN.md for the rationale. Contrast checked against WCAG AA.
+   ------------------------------------------------------------------- */
+
+@font-face {
+  font-family: 'Fraunces';
+  src: url('/fonts/fraunces-latin-600-normal.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fraunces';
+  src: url('/fonts/fraunces-latin-500-italic.woff2') format('woff2');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  /* Sky */
+  --bg-0: #090b13;
+  --bg-1: #12162a;
+  --bg-2: #1b2140;
+  --bg-3: #262d52;
+  --hairline: #2a3055;
+
+  /* Ink */
+  --ink-0: #f4f1e8;
+  --ink-1: #c3c6dd;
+  --ink-2: #9296b8;
+
+  /* Twilight accents */
+  --amber: #f2b84c;
+  --amber-dim: #b98a2e;
+  --mint: #7fe7c4;
+  --violet: #a78bfa;
+
+  /* Language dots (small, decorative UI — not text) */
+  --lang-ruby: #e35a4d;
+  --lang-go: #4cc9e8;
+  --lang-ts: #6ea8f5;
+  --lang-shell: #8ce07a;
+  --lang-c: #b7bcd6;
+  --lang-other: #6b7095;
+
+  --font-display: 'Fraunces', ui-serif, Georgia, 'Times New Roman', serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+
+  --measure: 68ch;
+  --radius: 10px;
+  --gutter: clamp(1.25rem, 4vw, 3rem);
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-0);
+  color: var(--ink-1);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  color: var(--ink-0);
+  margin: 0;
+  line-height: 1.15;
+  font-weight: 600;
+}
+
+p {
+  margin: 0;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+/* Focus ring — visible, consistent, never suppressed */
+:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -3rem;
+  background: var(--amber);
+  color: var(--bg-0);
+  padding: 0.6rem 1rem;
+  border-radius: 0 0 8px 8px;
+  font-weight: 700;
+  z-index: 100;
+  transition: top 0.15s ease;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.wrap {
+  width: min(1180px, 100% - var(--gutter) * 2);
+  margin-inline: auto;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.section-title {
+  margin-top: 0.6rem;
+  font-size: clamp(1.8rem, 3.6vw, 2.5rem);
+}
+
+html {
+  scroll-padding-top: 4.5rem;
+}
+
+/* Tokyo Night renders comments in #51597D, 2.6:1 on its own background.
+   Lift them to AA (5.7:1) without changing the rest of the theme. */
+.astro-code span[style*='#51597D' i] {
+  color: #8a93c2 !important;
+}

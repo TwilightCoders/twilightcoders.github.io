@@ -1,0 +1,68 @@
+---
+import { upcoming } from '../data/projects';
+---
+
+<section id="sneak-peek" class="peek" aria-labelledby="peek-heading">
+  <div class="wrap">
+    <p class="eyebrow">Sneak peek</p>
+    <h2 id="peek-heading" class="section-title">On the workbench</h2>
+    <p class="intro">
+      Projects we are building now and are not quite ready to show. They will get a proper page when they are.
+    </p>
+    <ul class="list">
+      {upcoming.map((u) => (
+        <li>
+          <p class="kind">{u.kind}</p>
+          <h3>{u.name}</h3>
+          <p>{u.summary}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .peek {
+    padding-block: clamp(3.5rem, 8vw, 5.5rem);
+    border-top: 1px solid var(--hairline);
+  }
+
+  .intro {
+    margin-top: 0.9rem;
+    color: var(--ink-2);
+    max-width: 44rem;
+  }
+
+  .list {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+    gap: 1rem;
+  }
+
+  .list li {
+    padding: 1.35rem 1.4rem;
+    border: 1px dashed var(--hairline);
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--bg-1) 60%, transparent);
+  }
+
+  .kind {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--amber);
+  }
+
+  h3 {
+    margin-top: 0.5rem;
+    font-size: 1.35rem;
+  }
+
+  .list p:last-child {
+    margin-top: 0.6rem;
+    color: var(--ink-1);
+    font-size: 0.95rem;
+  }
+</style>

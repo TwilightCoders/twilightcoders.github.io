@@ -1,0 +1,42 @@
+---
+import type { Status } from '../data/projects';
+
+interface Props {
+  status: Status;
+}
+
+const labels: Record<Status, string> = {
+  active: 'Active',
+  stable: 'Stable',
+  beta: 'Beta',
+  dormant: 'Dormant',
+  archive: 'Archive',
+  private: 'Source private',
+};
+
+const { status } = Astro.props;
+---
+
+<span class={`status status-${status}`}>{labels[status]}</span>
+
+<style>
+  .status {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    border: 1px solid currentColor;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+
+  .status-active { color: var(--mint); }
+  .status-beta { color: var(--amber); }
+  .status-stable { color: var(--ink-1); }
+  .status-dormant,
+  .status-archive,
+  .status-private { color: var(--ink-2); }
+</style>
