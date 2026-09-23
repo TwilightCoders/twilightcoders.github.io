@@ -1,72 +1,9 @@
 // GitHub API service for fetching TwilightCoders repositories
 
+import { selectRepositories, toDisplayRepository } from './repoData.js';
+
 const GITHUB_API_BASE = 'https://api.github.com';
 const ORG_NAME = 'TwilightCoders';
-
-// Repository blocklist - add repository names you don't want to display
-const REPOSITORY_BLOCKLIST = [
-  // Add repository names here to exclude them from the carousel
-  'ergane',
-  'foo_table-rails', 
-  'FreeNAS-Rails-Setup'
-];
-
-// Pinned repositories - manually configure which repos should appear first
-const REPOSITORY_INSISTLIST = [
-  // Add repository names here to pin them to the top of the carousel
-];
-
-/**
- * Extract title from README markdown content
- * @param {string} readmeContent - Raw README markdown content
- * @returns {string|null} Extracted title or null if not found
- */
-const extractReadmeTitle = (readmeContent) => {
-  if (!readmeContent) return null;
-  
-  // Look for the first # heading
-  const titleMatch = readmeContent.match(/^#\s+(.+)$/m);
-  if (titleMatch) {
-    let title = titleMatch[1].trim();
-    
-    // Clean up title by removing badge syntax and other markdown artifacts
-    title = cleanTitle(title);
-    
-    return title || null;
-  }
-  
-  // Fallback: look for any heading in the first few lines
-  const lines = readmeContent.split('\n').slice(0, 10);
-  for (const line of lines) {
-    const headingMatch = line.match(/^#{1,6}\s+(.+)$/);
-    if (headingMatch) {
-      let title = headingMatch[1].trim();
-      title = cleanTitle(title);
-      if (title) return title;
-    }
-  }
-  
-  return null;
-};
-
-/**
- * Clean up extracted title by truncating at unreasonable title characters
- * @param {string} title - Raw title text
- * @returns {string} Cleaned title
- */
-const cleanTitle = (title) => {
-  if (!title) return '';
-  
-  // Truncate at first occurrence of unreasonable title characters like [!
-  const match = title.match(/^([^[!]*)/);
-  return match ? match[1].trim() : title.trim();
-};
-
-/**
- * Get pinned repository names (manual insist list)
- * @returns {Array} Array of pinned repository names
- */
-const getPinnedRepositories = () => REPOSITORY_INSISTLIST;
 
 // Persistent cache using localStorage to avoid hitting rate limits
 const CACHE_KEY = 'twilight_coders_repos';
@@ -98,6 +35,21 @@ const setCache = (data) => {
 };
 
 /**
+ * Load the repository snapshot generated at build time
+ * @returns {Promise<Array|null>} Display-ready repositories, or null if unavailable
+ */
+const fetchRepositorySnapshot = async () => {
+  try {
+    const response = await fetch(`${import.meta.env.BASE_URL}repos.json`);
+    if (!response.ok) return null;
+    const repos = await response.json();
+    return Array.isArray(repos) && repos.length ? repos : null;
+  } catch {
+    return null;
+  }
+};
+
+/**
  * Fetch repositories for the TwilightCoders organization
  * @param {number} limit - Maximum number of repositories to fetch
  * @returns {Promise<Array>} Array of repository objects
@@ -111,80 +63,31 @@ export const fetchRepositories = async (limit = 6) => {
     return cachedData.slice(0, limit);
   }
   try {
+    // Prefer the snapshot written at build time (scripts/fetch-repos.mjs)
+    const snapshot = await fetchRepositorySnapshot();
+    if (snapshot) {
+      setCache(snapshot);
+      return snapshot.slice(0, limit);
+    }
+
     // Fetch a larger set to ensure we have enough after filtering and sorting
     const response = await fetch(
       `${GITHUB_API_BASE}/orgs/${ORG_NAME}/repos?per_page=100&type=public`
     );
-    
+
     if (!response.ok) {
       throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
     }
-    
+
     const repos = await response.json();
-    
-    // Filter out blocklisted repositories
-    const filteredRepos = repos.filter(repo => !REPOSITORY_BLOCKLIST.includes(repo.name));
-    
-    // Get pinned repositories (both homepage and manual insist list)
-    const pinnedRepoNames = getPinnedRepositories();
-    
-    // Sort repositories by priority: pinned > stars > recent activity
-    const sortedRepos = filteredRepos.sort((a, b) => {
-      const aIsPinned = pinnedRepoNames.includes(a.name);
-      const bIsPinned = pinnedRepoNames.includes(b.name);
-      
-      // First priority: pinned repositories
-      if (aIsPinned && !bIsPinned) return -1;
-      if (!aIsPinned && bIsPinned) return 1;
-      
-      // Second priority: star count (descending)
-      if (a.stargazers_count !== b.stargazers_count) {
-        return b.stargazers_count - a.stargazers_count;
-      }
-      
-      // Third priority: recent activity (descending)
-      return new Date(b.updated_at) - new Date(a.updated_at);
-    });
-    
-    // Take only the requested number of repositories
-    const limitedRepos = sortedRepos.slice(0, limit);
-    
+
     // Fetch README titles for each repository in parallel
     const reposWithTitles = await Promise.all(
-      limitedRepos.map(async (repo, index) => {
-        let displayName = repo.name;
-        
-        try {
-          const readme = await fetchRepositoryReadme(repo.name);
-          const readmeTitle = extractReadmeTitle(readme);
-          if (readmeTitle) {
-            displayName = readmeTitle;
-          }
-        } catch (error) {
-          console.log(`Could not fetch README for ${repo.name}, using repo name`);
-        }
-        
-        return {
-          id: repo.id,
-          index: index,
-          name: repo.name, // Keep original name for URL purposes
-          displayName: displayName, // Use for display
-          description: repo.description || 'No description available',
-          url: repo.html_url,
-          homepage: repo.homepage,
-          stars: repo.stargazers_count,
-          forks: repo.forks_count,
-          language: repo.language,
-          updatedAt: repo.updated_at,
-          createdAt: repo.created_at,
-          topics: repo.topics || [],
-          isPrivate: repo.private,
-          // Fallback for repositories without descriptions
-          displayDescription: repo.description || `A ${repo.language || 'software'} project by Twilight Coders`
-        };
-      })
+      selectRepositories(repos, limit).map(async (repo, index) =>
+        toDisplayRepository(repo, index, await fetchRepositoryReadme(repo.name))
+      )
     );
-    
+
     // Cache the results persistently
     setCache(reposWithTitles);
     

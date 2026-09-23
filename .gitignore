@@ -145,3 +145,6 @@ tramp
 .claude/
 CLAUDE.md
 claude.md
+
+# Build-time GitHub snapshot (scripts/fetch-repos.mjs)
+public/repos.json

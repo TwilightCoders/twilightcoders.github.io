@@ -6,9 +6,11 @@
   "homepage": "https://twilightcoders.net",
   "scripts": {
     "dev": "vite --host",
+    "prebuild": "node scripts/fetch-repos.mjs",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node --test scripts/"
   },
   "dependencies": {
     "framer-motion": "^12.23.6",
