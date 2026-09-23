@@ -8,7 +8,7 @@ const products = [
     tagline: 'ClaudePilot, Upuppy and our other commercial apps live at twilightcoders.com',
     icon: '/icons/upuppy.png',
     tech: 'twilightcoders.com',
-    url: 'https://twilightcoders.com',
+    url: 'https://twilightcoders.com/#products',
   },
   {
     name: 'Galaxer',

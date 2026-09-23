@@ -11,7 +11,7 @@ const Footer = () => {
               <Github size={18} />
               GitHub
             </a>
-            <a href="https://twilightcoders.com">
+            <a href="https://twilightcoders.com/#contact">
               <Store size={18} />
               Products &amp; contact
             </a>
