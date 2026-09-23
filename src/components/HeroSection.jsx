@@ -5,7 +5,7 @@ import { useActiveSection } from '../hooks/useActiveSection';
 import './HeroSection.scss';
 
 const NAV_ITEMS = [
-  { id: 'products', label: 'Products' },
+  { id: 'projects', label: 'Projects' },
   { id: 'open-source', label: 'Open Source' },
   { id: 'about', label: 'About' },
 ];
@@ -57,7 +57,7 @@ const HeroSection = () => {
   };
 
   const scrollToProducts = () => {
-    document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -105,7 +105,7 @@ const HeroSection = () => {
           className="scroll-indicator"
           onClick={scrollToProducts}
           style={{ opacity: contentOpacity, pointerEvents: collapsed ? 'none' : 'auto' }}
-          aria-label="Scroll to products"
+          aria-label="Scroll to projects"
         >
           <ChevronDown size={28} />
         </motion.button>

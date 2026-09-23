@@ -13,14 +13,12 @@ const AboutSection = () => {
         <h2 className="section-heading">About</h2>
         <div className="about-content">
           <p>
-            We're a creative development collective focused on building innovative web solutions
-            and contributing to the open-source community. Our passion lies in crafting elegant
-            code that solves real problems and pushes the boundaries of what's possible.
+            This is the open-source home of Twilight Coders: the Ruby gems, developer tools and
+            experiments we build in the open and maintain for anyone to use.
           </p>
           <p>
-            From React applications to Ruby gems, from AI integrations to developer tools — we
-            believe in the power of thoughtful engineering and clean architecture to create
-            software that stands the test of time.
+            Looking for our apps, support or a way to get in touch? Head to{' '}
+            <a href="https://twilightcoders.com">twilightcoders.com</a>.
           </p>
         </div>
       </motion.div>
